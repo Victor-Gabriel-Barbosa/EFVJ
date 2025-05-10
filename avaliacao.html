@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliação | Eu Faço Você Joga</title>
+  <link rel="stylesheet" href="src/style/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <!-- Adiciona o script da barra de navegação -->
+  <script src="src/code/navbar.js"></script>
+  <!-- Adiciona o script de configuração do Firebase -->
+  <script src="src/code/firebase-config.js"></script>
+  <!-- Adiciona o script de autenticação -->
+  <script src="src/code/auth.js"></script>
+</head>
+
+<body>
+  <div class="game-container">
+    <header class="game-header">
+      <div class="pixel-box title-box">
+        <h1 class="pixel-title">Eu Faço Você Joga</h1>
+      </div>
+      <div id="user-status" class="user-status">
+        <!-- Será preenchido via JavaScript apenas com informações do usuário -->
+      </div>
+    </header>
+
+    <!-- Container para a navbar compartilhada -->
+    <div id="navbar-container"></div>
+
+    <main class="game-main">
+      <section class="pixel-box">
+        <h2 class="pixel-subtitle">Avalie os Jogos</h2>
+        <p>Dê sua opinião sobre os jogos que você experimentou em diferentes categorias!</p>
+
+        <div class="rating-form" id="avaliacaoForm">
+          <div class="form-group">
+            <label for="game-select">Selecione o jogo:</label>
+            <select id="game-select" class="pixel-select" required>
+              <option value="">-- Escolha um jogo --</option>
+              <!-- Opções serão carregadas via JavaScript -->
+            </select>
+          </div>
+
+          <!-- Avaliação por categoria -->
+          <div class="categories-rating">
+            <h3 class="category-title">Avaliação por Categoria</h3>
+            
+            <div class="category-rating">
+              <label>Gameplay:</label>
+              <div class="star-rating" data-category="gameplay">
+                <input type="radio" id="gameplay-star5" name="gameplay-rating" value="5" />
+                <label for="gameplay-star5" class="pixel-star"></label>
+                <input type="radio" id="gameplay-star4" name="gameplay-rating" value="4" />
+                <label for="gameplay-star4" class="pixel-star"></label>
+                <input type="radio" id="gameplay-star3" name="gameplay-rating" value="3" />
+                <label for="gameplay-star3" class="pixel-star"></label>
+                <input type="radio" id="gameplay-star2" name="gameplay-rating" value="2" />
+                <label for="gameplay-star2" class="pixel-star"></label>
+                <input type="radio" id="gameplay-star1" name="gameplay-rating" value="1" />
+                <label for="gameplay-star1" class="pixel-star"></label>
+              </div>
+            </div>
+            
+            <div class="category-rating">
+              <label>Visual:</label>
+              <div class="star-rating" data-category="visual">
+                <input type="radio" id="visual-star5" name="visual-rating" value="5" />
+                <label for="visual-star5" class="pixel-star"></label>
+                <input type="radio" id="visual-star4" name="visual-rating" value="4" />
+                <label for="visual-star4" class="pixel-star"></label>
+                <input type="radio" id="visual-star3" name="visual-rating" value="3" />
+                <label for="visual-star3" class="pixel-star"></label>
+                <input type="radio" id="visual-star2" name="visual-rating" value="2" />
+                <label for="visual-star2" class="pixel-star"></label>
+                <input type="radio" id="visual-star1" name="visual-rating" value="1" />
+                <label for="visual-star1" class="pixel-star"></label>
+              </div>
+            </div>
+            
+            <div class="category-rating">
+              <label>Som:</label>
+              <div class="star-rating" data-category="som">
+                <input type="radio" id="som-star5" name="som-rating" value="5" />
+                <label for="som-star5" class="pixel-star"></label>
+                <input type="radio" id="som-star4" name="som-rating" value="4" />
+                <label for="som-star4" class="pixel-star"></label>
+                <input type="radio" id="som-star3" name="som-rating" value="3" />
+                <label for="som-star3" class="pixel-star"></label>
+                <input type="radio" id="som-star2" name="som-rating" value="2" />
+                <label for="som-star2" class="pixel-star"></label>
+                <input type="radio" id="som-star1" name="som-rating" value="1" />
+                <label for="som-star1" class="pixel-star"></label>
+              </div>
+            </div>
+            
+            <div class="category-rating">
+              <label>Originalidade:</label>
+              <div class="star-rating" data-category="originalidade">
+                <input type="radio" id="originalidade-star5" name="originalidade-rating" value="5" />
+                <label for="originalidade-star5" class="pixel-star"></label>
+                <input type="radio" id="originalidade-star4" name="originalidade-rating" value="4" />
+                <label for="originalidade-star4" class="pixel-star"></label>
+                <input type="radio" id="originalidade-star3" name="originalidade-rating" value="3" />
+                <label for="originalidade-star3" class="pixel-star"></label>
+                <input type="radio" id="originalidade-star2" name="originalidade-rating" value="2" />
+                <label for="originalidade-star2" class="pixel-star"></label>
+                <input type="radio" id="originalidade-star1" name="originalidade-rating" value="1" />
+                <label for="originalidade-star1" class="pixel-star"></label>
+              </div>
+            </div>
+          </div>
+
+          <div class="form-group">
+            <label for="comment">Comentário:</label>
+            <textarea id="comment" class="pixel-textarea" rows="4" placeholder="O que você achou do jogo?"></textarea>
+          </div>
+
+          <button type="submit" id="submit-rating" class="big-pixel-button">Enviar Avaliação</button>
+          <div id="rating-result" class="rating-result"></div>
+        </div>
+      </section>
+
+      <section class="pixel-box">
+        <h2 class="pixel-subtitle">Ranking dos Jogos</h2>
+        <div class="ranking-options">
+          <label for="ranking-category">Filtrar por categoria:</label>
+          <select id="ranking-category" class="pixel-select">
+            <option value="geral">Avaliação Geral</option>
+            <option value="gameplay">Gameplay</option>
+            <option value="visual">Visual</option>
+            <option value="som">Som</option>
+            <option value="originalidade">Originalidade</option>
+          </select>
+        </div>
+        <div id="ranking-table" class="ranking-table">
+          <div class="ranking-header">
+            <div class="rank-column">Posição</div>
+            <div class="game-column">Jogo</div>
+            <div class="creator-column">Criador</div>
+            <div class="rating-column">Nota</div>
+          </div>
+          <div id="ranking-content">
+            <!-- Conteúdo do ranking será preenchido via JavaScript -->
+            <div class="loading-message">Carregando ranking...</div>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="game-footer">
+      <div class="pixel-box">
+        <p>© 2025 Eu Faço Você Joga | Criado por Victor-Gabriel-Barbosa</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="src/code/main.js"></script>
+  <script src="src/code/jogos-crud.js"></script>
+  <script src="src/code/avaliacao.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil | Eu Faço Você Joga</title>
+  <link rel="stylesheet" href="src/style/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <!-- Adiciona o script da barra de navegação -->
+  <script src="src/code/navbar.js"></script>
+</head>
+
+<body>
+  <div class="game-container">
+    <header class="game-header">
+      <div class="pixel-box title-box">
+        <h1 class="pixel-title">Eu Faço Você Joga</h1>
+      </div>
+      <div id="user-status" class="user-status">
+        <!-- Será preenchido via JavaScript apenas com informações do usuário -->
+      </div>
+    </header>
+
+    <!-- Container para a navbar compartilhada -->
+    <div id="navbar-container"></div>
+
+    <main class="game-main">
+      <!-- Seção de login (mostrada quando o usuário não está logado) -->
+      <section id="login-section" class="pixel-box">
+        <h2 class="pixel-subtitle">Acesse sua conta</h2>
+        <p>Faça login para submeter seus jogos, fazer avaliações e personalizar sua experiência.</p>
+        
+        <div class="login-buttons">
+          <button id="google-login" class="pixel-button login-btn">
+            <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" width="18">
+            Entrar com Google
+          </button>
+        </div>
+      </section>
+
+      <!-- Seção de perfil (mostrada quando o usuário está logado) -->
+      <section id="profile-section" class="pixel-box hidden" style="display: none;">
+        <div class="profile-header">
+          <div class="profile-avatar">
+            <img id="user-avatar" src="" alt="Avatar do usuário">
+          </div>
+          <div class="profile-info">
+            <h2 id="user-name" class="pixel-subtitle">Nome do Usuário</h2>
+            <p id="user-email">email@exemplo.com</p>
+          </div>
+          <button id="logout-btn" class="pixel-button">Sair</button>
+        </div>
+        
+        <div class="profile-content">
+          <h3 class="section-title">Meus Jogos</h3>
+          <div id="user-games" class="games-grid">
+            <!-- Jogos do usuário serão carregados aqui -->
+            <p class="no-games-message">Você ainda não enviou nenhum jogo. <a href="jogos.html" class="text-link">Submeta seu primeiro jogo!</a></p>
+          </div>
+          
+          <h3 class="section-title">Minhas Avaliações</h3>
+          <div id="user-reviews" class="reviews-list">
+            <!-- Avaliações do usuário serão carregadas aqui -->
+            <p class="no-reviews-message">Você ainda não fez nenhuma avaliação. <a href="avaliacao.html" class="text-link">Avalie um jogo!</a></p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <footer class="game-footer">
+      <div class="pixel-box">
+        <p>© 2025 Eu Faço Você Joga | Criado por Victor-Gabriel-Barbosa</p>
+      </div>
+    </footer>
+  </div>
+
+  <!-- Scripts -->
+  <script src="src/code/firebase-config.js"></script>
+  <script src="src/code/auth.js"></script>
+  <script src="src/code/main.js"></script>
+</body>
+
+</html>

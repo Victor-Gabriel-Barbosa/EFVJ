@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Eu Faço Você Joga</title>
+  <link rel="stylesheet" href="src/style/styles.css">
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  
+  <!-- Firebase SDK -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
+  <!-- Adiciona o script da barra de navegação -->
+  <script src="src/code/navbar.js"></script>
+</head>
+
+<body>
+  <div class="game-container">
+    <header class="game-header">
+      <div class="pixel-box title-box">
+        <h1 class="pixel-title">Eu Faço Você Joga</h1>
+      </div>
+      <div id="user-status" class="user-status">
+        <!-- Informações do usuário logado (apenas foto e nome) -->
+      </div>
+    </header>
+
+    <!-- Container para a navbar compartilhada -->
+    <div id="navbar-container"></div>
+
+    <main class="game-main">
+      <section class="pixel-box intro-section">
+        <h2 class="pixel-subtitle">Bem-vindo ao nosso evento de jogos!</h2>
+        <div class="pixel-character"></div>
+        <p>Aqui cada participante cria seu próprio jogo e depois nos reunimos para jogar e avaliar as criações de todos!
+        </p>
+
+        <div class="features">
+          <div class="feature">
+            <div class="pixel-icon create-icon"></div>
+            <h3>Crie</h3>
+            <p>Desenvolva seu próprio jogo com sua criatividade</p>
+          </div>
+          <div class="feature">
+            <div class="pixel-icon play-icon"></div>
+            <h3>Jogue</h3>
+            <p>Experimente os jogos criados pelos outros participantes</p>
+          </div>
+          <div class="feature">
+            <div class="pixel-icon rate-icon"></div>
+            <h3>Avalie</h3>
+            <p>Dê notas e feedback para os jogos que você jogou</p>
+          </div>
+        </div>
+
+        <a href="jogos.html" class="big-pixel-button">Ver Jogos</a>
+      </section>
+
+      <section class="pixel-box about-section">
+        <h2 class="pixel-subtitle">Sobre o Projeto</h2>
+        <p>O "Eu Faço Você Joga" é uma iniciativa para incentivar a criatividade e o aprendizado na criação de jogos.
+          Cada participante desenvolve um jogo seguindo um tema definido, e depois todos se reúnem para jogar e avaliar
+          os jogos uns dos outros.</p>
+        <p>Este é um espaço para compartilhar conhecimento, receber feedback e se divertir com criações originais!</p>
+      </section>
+    </main>
+
+    <footer class="game-footer">
+      <div class="pixel-box">
+        <p>© 2025 Eu Faço Você Joga | Criado por Victor-Gabriel-Barbosa</p>
+      </div>
+    </footer>
+  </div>
+
+  <script src="src/code/main.js"></script>
+</body>
+
+</html>
