@@ -1,0 +1,290 @@
+/* Estilos para o perfil do usuário e histórico */
+
+/* Última data de login */
+.last-login {
+  font-size: 0.7em;
+  color: var(--light);
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+/* Estilo para estatísticas */
+.stats-container {
+  background-color: rgba(26, 18, 38, 0.9);
+  border-radius: 4px;
+  padding: 12px;
+  margin-bottom: 24px;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  gap: 15px;
+}
+
+.stat-item {
+  background-color: var(--dark);
+  border: 2px solid var(--secondary);
+  padding: 10px;
+  text-align: center;
+  border-radius: 4px;
+}
+
+.stat-item h4 {
+  font-size: 1.5em;
+  color: var(--accent);
+  margin-bottom: 5px;
+}
+
+.stat-item p {
+  font-size: 0.6em;
+  color: var(--light);
+}
+
+/* Estilo para conquistas */
+.achievements-container {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
+.achievement-item {
+  display: flex;
+  align-items: center;
+  background-color: rgba(26, 18, 38, 0.9);
+  border-left: 4px solid var(--primary);
+  padding: 12px;
+  border-radius: 4px;
+}
+
+.achievement-icon {
+  width: 36px;
+  height: 36px;
+  background-color: var(--dark);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-right: 12px;
+}
+
+.achievement-icon.locked {
+  opacity: 0.5;
+  filter: grayscale(100%);
+}
+
+.achievement-icon.unlocked {
+  color: var(--accent);
+  border: 2px solid var(--accent);
+}
+
+.achievement-info {
+  flex: 1;
+}
+
+.achievement-info h4 {
+  font-size: 0.8em;
+  margin-bottom: 4px;
+}
+
+.achievement-info p {
+  font-size: 0.6em;
+  color: var(--light);
+  opacity: 0.8;
+}
+
+.achievement-date {
+  display: block;
+  font-size: 0.6em;
+  color: var(--accent);
+  margin-top: 4px;
+}
+
+/* Estilo para linha do tempo */
+.activity-container {
+  margin-bottom: 24px;
+}
+
+.timeline {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  margin-left: 12px;
+}
+
+.timeline::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 12px;
+  width: 2px;
+  background-color: var(--secondary);
+}
+
+.timeline-item {
+  position: relative;
+  padding: 12px 12px 12px 40px;
+  margin-bottom: 20px;
+  background-color: rgba(26, 18, 38, 0.9);
+  border-radius: 4px;
+}
+
+.timeline-icon {
+  position: absolute;
+  left: -12px;
+  width: 24px;
+  height: 24px;
+  background-color: var(--secondary);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7em;
+  z-index: 1;
+}
+
+.timeline-content h4 {
+  font-size: 0.8em;
+  color: var(--primary);
+  margin-bottom: 5px;
+}
+
+.timeline-content p {
+  font-size: 0.7em;
+}
+
+.timeline-date {
+  display: block;
+  font-size: 0.6em;
+  color: var(--light);
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+/* Estilos para interações recentes */
+.interacoes-container {
+  margin-bottom: 24px;
+}
+
+.interacao-item {
+  display: flex;
+  align-items: flex-start;
+  background-color: rgba(26, 18, 38, 0.9);
+  padding: 12px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  position: relative;
+}
+
+.interacao-user {
+  margin-right: 12px;
+}
+
+.interacao-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  object-fit: cover;
+  border: 2px solid var(--secondary);
+}
+
+.interacao-content {
+  flex: 1;
+}
+
+.interacao-name {
+  font-size: 0.7em;
+  color: var(--primary);
+  font-weight: bold;
+}
+
+.interacao-type {
+  font-size: 0.7em;
+  color: var(--light);
+}
+
+.interacao-desc {
+  font-size: 0.65em;
+  color: var(--light);
+  opacity: 0.9;
+  margin-top: 4px;
+}
+
+.interacao-date {
+  display: block;
+  font-size: 0.6em;
+  color: var(--light);
+  opacity: 0.7;
+  margin-top: 5px;
+}
+
+.interacao-icon {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  color: var(--secondary);
+  font-size: 0.8em;
+  opacity: 0.7;
+}
+
+.no-interactions-message {
+  font-size: 0.7em;
+  padding: 12px;
+  text-align: center;
+  background-color: rgba(26, 18, 38, 0.9);
+  border-radius: 4px;
+  color: var(--light);
+  opacity: 0.7;
+}
+
+/* Responsividade para interações */
+@media (max-width: 768px) {
+  .interacao-item {
+    padding: 8px;
+  }
+  
+  .interacao-avatar {
+    width: 28px;
+    height: 28px;
+  }
+}
+
+/* Mensagens de estado */
+.loading-message, .no-activity-message, .no-games-message, .no-reviews-message, .error-message {
+  font-size: 0.7em;
+  padding: 12px;
+  text-align: center;
+  background-color: rgba(26, 18, 38, 0.9);
+  border-radius: 4px;
+}
+
+.loading-message {
+  color: var(--warning);
+}
+
+.error-message {
+  color: var(--danger);
+}
+
+.no-activity-message, .no-games-message, .no-reviews-message {
+  color: var(--light);
+  opacity: 0.7;
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .stats-grid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  
+  .achievement-item, .timeline-item {
+    padding: 10px;
+  }
+  
+  .achievement-icon {
+    width: 30px;
+    height: 30px;
+  }
+}

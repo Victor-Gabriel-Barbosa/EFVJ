@@ -16,6 +16,10 @@ const userName = document.getElementById('user-name');
 const userEmail = document.getElementById('user-email');
 const userGames = document.getElementById('user-games');
 const userReviews = document.getElementById('user-reviews');
+const lastLoginTime = document.getElementById('last-login-time');
+const statsContainer = document.getElementById('user-stats');
+const activityTimeline = document.getElementById('activity-timeline');
+const achievementsList = document.getElementById('achievements-list');
 
 // Estado atual do usuário
 let currentUser = null;
@@ -41,6 +45,16 @@ function loginWithGoogle() {
 
 // Função para fazer logout
 function logout() {
+  // Se temos acesso ao objeto userHistory, registramos a atividade de logout
+  if (window.userHistory && currentUser) {
+    window.userHistory.registerActivity(
+      currentUser.uid, 
+      'logout', 
+      'Logout da plataforma', 
+      `${currentUser.displayName} saiu da plataforma`
+    );
+  }
+  
   auth.signOut()
     .then(() => {
       // Logout bem-sucedido
@@ -61,13 +75,31 @@ function displayUserProfile(user) {
   
   // Esconde a seção de login e mostra o perfil apenas se os elementos existirem
   if (loginSection) loginSection.classList.add('hidden');
-  if (profileSection) profileSection.classList.remove('hidden');
+  if (profileSection) {
+    profileSection.classList.remove('hidden');
+    profileSection.style.display = 'block';
+  }
   
   // Carrega os jogos do usuário apenas se o elemento existir
   if (userGames) loadUserGames(user.uid);
   
   // Carrega as avaliações do usuário apenas se o elemento existir
   if (userReviews) loadUserReviews(user.uid);
+  
+  // Carrega informações de histórico e estatísticas
+  if (window.userHistory) {
+    if (activityTimeline) window.userHistory.loadHistory(user.uid);
+    if (statsContainer) window.userHistory.loadStats(user.uid);
+    if (achievementsList) window.userHistory.loadAchievements(user.uid);
+    
+    // Registra a atividade de login
+    window.userHistory.registerActivity(
+      user.uid, 
+      'login', 
+      'Login na plataforma', 
+      `${user.displayName} acessou a plataforma`
+    );
+  }
 }
 
 // Função para resetar a interface quando não há usuário logado
@@ -226,6 +258,16 @@ auth.onAuthStateChanged((user) => {
     
     // Atualiza a interface
     displayUserProfile(user);
+    
+    // Registra a atividade de login se o userHistory estiver disponível
+    if (window.userHistory) {
+      window.userHistory.registerActivity(
+        user.uid, 
+        'login', 
+        'Login na plataforma', 
+        `${user.displayName} acessou a plataforma`
+      );
+    }
     
     // Dispara evento personalizado para informar outras páginas
     const authEvent = new CustomEvent('userAuthenticated', { detail: user });

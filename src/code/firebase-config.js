@@ -16,5 +16,10 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
-// Referência à coleção de jogos
+// Referências às coleções
 const jogosCollection = db.collection('jogos');
+const avaliacoesCollection = db.collection('avaliacoes');
+const comentariosCollection = db.collection('comentarios');
+const usuariosCollection = db.collection('usuarios');
+const atividadesCollection = db.collection('atividades');
+const conquistasCollection = db.collection('conquistas');
