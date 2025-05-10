@@ -11,7 +11,14 @@
 function createNavbar(targetElementId, callback) {
   const navbarHTML = `
     <nav class="game-nav">
-      <ul>
+      <button class="mobile-menu-toggle" aria-label="Menu">
+        <div class="hamburger-icon">
+          <span></span>
+          <span></span>
+          <span></span>
+        </div>
+      </button>
+      <ul class="nav-menu">
         <li><a href="index.html" class="pixel-button" id="nav-home">Início</a></li>
         <li><a href="jogos.html" class="pixel-button" id="nav-games">Jogos</a></li>
         <li><a href="avaliacao.html" class="pixel-button" id="nav-rating">Avaliação</a></li>
@@ -31,6 +38,9 @@ function createNavbar(targetElementId, callback) {
 
     // Configura botões de autenticação
     configurarBotoesAutenticacao();
+    
+    // Configura o botão do menu mobile
+    configurarMenuMobile();
 
     // Executa callback se fornecido
     if (callback && typeof callback === 'function') callback();
@@ -124,6 +134,37 @@ function configurarBotoesAutenticacao() {
         // Verifica se temos a função de logout definida em auth.js
         if (window.userAuth && typeof window.userAuth.logout === 'function') window.userAuth.logout();
         else firebase.auth().signOut(); // Fallback para logout direto
+      }
+    });
+  }
+}
+
+// Configura o botão do menu mobile
+function configurarMenuMobile() {
+  const menuToggle = document.querySelector('.mobile-menu-toggle');
+  const navMenu = document.querySelector('.nav-menu');
+
+  if (menuToggle && navMenu) {
+    menuToggle.addEventListener('click', function () {
+      navMenu.classList.toggle('active');
+      menuToggle.classList.toggle('active'); // Adiciona/remove classe active no botão para animar o ícone
+    });
+    
+    // Fecha o menu quando um item é clicado
+    const menuItems = navMenu.querySelectorAll('a, button');
+    menuItems.forEach(item => {
+      item.addEventListener('click', function() {
+        navMenu.classList.remove('active');
+        menuToggle.classList.remove('active');
+      });
+    });
+    
+    // Fecha o menu quando clica fora dele
+    document.addEventListener('click', function(event) {
+      const isClickInside = navMenu.contains(event.target) || menuToggle.contains(event.target);
+      if (!isClickInside && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        menuToggle.classList.remove('active');
       }
     });
   }
