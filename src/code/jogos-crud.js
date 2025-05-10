@@ -364,6 +364,11 @@ function abrirModal() {
   }
 
   const modal = document.getElementById('modal-jogo');
+  if (!modal) {
+    console.error('Elemento modal-jogo não encontrado!');
+    return;
+  }
+  
   modal.style.display = 'flex';
   document.body.style.overflow = 'hidden';
 
