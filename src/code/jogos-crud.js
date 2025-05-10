@@ -421,48 +421,58 @@ function salvarJogo(evento) {
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-  // Carrega jogos ao iniciar a página
-  carregarJogos();
-
-  // Configurar listeners para filtros
-  document.querySelectorAll('.filter-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
-      e.target.classList.add('active');
-      filtrarJogos(e.target.dataset.filter);
+  // Verifica se estamos na página de jogos antes de inicializar funcionalidades específicas
+  const isJogosPage = window.location.pathname.includes('jogos.html');
+  
+  // Carrega jogos apenas se estiver na página de jogos
+  if (isJogosPage) {
+    carregarJogos();
+    
+    // Configurar listeners para filtros
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+        e.target.classList.add('active');
+        filtrarJogos(e.target.dataset.filter);
+      });
     });
-  });
-
-  // Configurar listener para botão de adicionar jogo
-  const addButton = document.querySelector('.add-game-btn');
-  if (addButton) {
-    console.log('Botão de adicionar jogo encontrado:', addButton);
-    addButton.addEventListener('click', (e) => {
-      e.preventDefault();
-      console.log('Clique no botão de adicionar jogo detectado');
-      abrirModal();
-    });
-  } else {
-    console.error('Botão de adicionar jogo não encontrado na página!');
+    
+    // Configurar listener para botão de adicionar jogo
+    const addButton = document.querySelector('.add-game-btn');
+    if (addButton) {
+      console.log('Botão de adicionar jogo encontrado:', addButton);
+      addButton.addEventListener('click', (e) => {
+        e.preventDefault();
+        console.log('Clique no botão de adicionar jogo detectado');
+        abrirModal();
+      });
+    } else {
+      console.error('Botão de adicionar jogo não encontrado na página de jogos!');
+    }
   }
 
-  // Configurar listener para formulário
-  const formulario = document.getElementById('form-jogo');
-  if (formulario) formulario.addEventListener('submit', salvarJogo);
+  // Configurar listeners apenas se estiver na página de jogos
+  if (isJogosPage) {
+    // Configurar listener para formulário
+    const formulario = document.getElementById('form-jogo');
+    if (formulario) formulario.addEventListener('submit', salvarJogo);
 
-  // Configurar listeners para fechar modal
-  const closeButtons = document.querySelectorAll('.close-modal, .cancel-btn');
-  closeButtons.forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      e.preventDefault();
-      fecharModal();
+    // Configurar listeners para fechar modal
+    const closeButtons = document.querySelectorAll('.close-modal, .cancel-btn');
+    closeButtons.forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.preventDefault();
+        fecharModal();
+      });
     });
-  });
+  }
 
-  // Escuta eventos de autenticação
+  // Escuta eventos de autenticação (isso pode ser útil em qualquer página)
   document.addEventListener('userAuthenticated', () => {
     // Atualiza a interface quando um usuário faz login
-    carregarJogos();
+    if (isJogosPage) {
+      carregarJogos();
+    }
 
     // Mostra o botão de adicionar jogo
     const addBtn = document.querySelector('.add-game-btn');
