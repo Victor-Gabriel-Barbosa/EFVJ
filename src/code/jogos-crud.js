@@ -1,5 +1,13 @@
 // Funções para manipulação de jogos no Firestore
 
+// Configuração dos metadados para resolver problema de CORS
+const metadataStorage = {
+  contentType: 'image/jpeg',
+  customMetadata: {
+    'firebaseStorageDownloadTokens': Math.random().toString(36).substring(2)
+  }
+};
+
 // Função para carregar todos os jogos
 async function carregarJogos() {
   try {
@@ -146,8 +154,11 @@ async function adicionarJogo(evento) {
 
     if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
-      const storageRef = storage.ref(`thumbnails/${Date.now()}_${file.name}`);
-      await storageRef.put(file);
+      const filename = `${Date.now()}_${file.name}`;
+      const storageRef = storage.ref(`thumbnails/${filename}`);
+      
+      // Usar os metadados customizados para resolver problema de CORS
+      await storageRef.put(file, metadataStorage);
       thumbnailUrl = await storageRef.getDownloadURL();
     }
 
@@ -279,8 +290,11 @@ async function atualizarJogo(evento, jogoId) {
     const thumbnailInput = formulario.thumbnail;
     if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
-      const storageRef = storage.ref(`thumbnails/${Date.now()}_${file.name}`);
-      await storageRef.put(file);
+      const filename = `${Date.now()}_${file.name}`;
+      const storageRef = storage.ref(`thumbnails/${filename}`);
+      
+      // Usar os metadados customizados para resolver problema de CORS
+      await storageRef.put(file, metadataStorage);
       dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
     }
 
