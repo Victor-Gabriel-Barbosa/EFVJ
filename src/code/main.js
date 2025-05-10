@@ -37,7 +37,6 @@ function inicializarFirebase() {
 
 // Atualiza o status do usuário na interface
 function atualizarStatusUsuario(user) {
-  const userStatusElement = document.getElementById('user-status');
   const loginBtn = document.getElementById('nav-login-btn');
   const logoutBtn = document.getElementById('nav-logout-btn');
   const userNavInfo = document.querySelector('.user-nav-info');
@@ -64,18 +63,6 @@ function atualizarStatusUsuario(user) {
       if (navUserName) navUserName.textContent = 'Usuário';
     }
   }
-
-  if (!userStatusElement) return;
-
-  if (user) {
-    // Usuário está logado
-    userStatusElement.innerHTML = `
-      <div class="user-info">
-          <img src="${user.photoURL || 'https://via.placeholder.com/32?text=U'}" alt="${user.displayName}" class="user-avatar">
-          <span class="user-name">${user.displayName || 'Usuário'}</span>
-      </div>
-    `;
-  } else userStatusElement.innerHTML = ''; // Usuário não está logado
 }
 
 // Inicializa a página de jogos
