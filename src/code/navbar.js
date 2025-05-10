@@ -21,7 +21,7 @@ function createNavbar(targetElementId, callback) {
       </button>
       
       <!-- Logo ou título do site (pode ser adicionado) -->
-      <div class="nav-brand">
+      <div class="nav-brand" style="z-index: 1000;">
         <a href="index.html">EFVJ</a>
       </div>
       
@@ -32,7 +32,7 @@ function createNavbar(targetElementId, callback) {
           <li><a href="index.html" class="pixel-button" id="nav-home">Início</a></li>
           <li><a href="jogos.html" class="pixel-button" id="nav-games">Jogos</a></li>
           <li><a href="avaliacao.html" class="pixel-button" id="nav-rating">Avaliação</a></li>
-          <li><a href="usuario.html" class="pixel-button" id="nav-profile">Meu Perfil</a></li>
+          <li><a href="usuario.html" class="pixel-button" id="nav-profile">Perfil</a></li>
         </ul>
         
         <!-- Área do usuário -->
