@@ -405,6 +405,28 @@ function salvarJogo(evento) {
   (jogoId) ? atualizarJogo(evento, jogoId) : adicionarJogo(evento);
 }
 
+// Função para verificar se o usuário está logado e atualizar a interface
+function verificarLoginEAtualizarUI() {
+  console.log('Verificando login e atualizando UI...');
+  
+  // Obter o botão de adicionar jogo
+  const addBtn = document.querySelector('.add-game-btn');
+  if (!addBtn) return;
+  
+  // Verificar se o usuário está logado diretamente com Firebase Auth
+  const user = firebase.auth().currentUser;
+  
+  if (user) {
+    // Usuário está logado, mostra o botão
+    addBtn.style.display = 'inline-block';
+    console.log('Usuário logado:', user.displayName, '- botão visível');
+  } else {
+    // Usuário não está logado, esconde o botão
+    addBtn.style.display = 'none';
+    console.log('Usuário não logado - botão oculto');
+  }
+}
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
   // Carrega jogos ao iniciar a página
@@ -446,42 +468,24 @@ document.addEventListener('DOMContentLoaded', () => {
   });
 
   // Escuta eventos de autenticação
-  document.addEventListener('userAuthenticated', () => {
+  document.addEventListener('userAuthenticated', (_event) => {
     // Atualiza a interface quando um usuário faz login
     carregarJogos();
-
-    // Mostra o botão de adicionar jogo
-    const addBtn = document.querySelector('.add-game-btn');
-    if (addBtn) {
-      addBtn.style.display = 'inline-block';
-      console.log('Usuário autenticado, botão visível');
-    }
+    verificarLoginEAtualizarUI();
   });
 
   document.addEventListener('userLoggedOut', () => {
     // Atualiza a interface quando um usuário faz logout
     carregarJogos();
-
-    // Esconde o botão de adicionar jogo se necessário
-    const addBtn = document.querySelector('.add-game-btn');
-    if (addBtn) {
-      addBtn.style.display = 'none';
-      console.log('Usuário deslogado, botão oculto');
-    }
+    verificarLoginEAtualizarUI();
   });
 
-  // Verifica se o usuário está logado ao carregar a página
-  const currentUser = window.userAuth?.currentUser();
-  const addBtn = document.querySelector('.add-game-btn');
+  // Verifica estado de autenticação quando a página carrega
+  firebase.auth().onAuthStateChanged(function(user) {
+    console.log('Estado de autenticação mudou:', user ? 'Usuário logado' : 'Usuário deslogado');
+    verificarLoginEAtualizarUI();
+  });
   
-  if (addBtn) {
-    // Forçar exibição do botão se estiver logado
-    if (currentUser) {
-      addBtn.style.display = 'inline-block';
-      console.log('Usuário logado, botão visível na inicialização');
-    } else {
-      addBtn.style.display = 'none';
-      console.log('Usuário não logado, botão oculto na inicialização');
-    }
-  }
+  // Verifica o login imediatamente também
+  verificarLoginEAtualizarUI();
 });
