@@ -33,9 +33,7 @@ function createNavbar(targetElementId, callback) {
     configurarBotoesAutenticacao();
 
     // Executa callback se fornecido
-    if (callback && typeof callback === 'function') {
-      callback();
-    }
+    if (callback && typeof callback === 'function') callback();
   } else {
     console.error(`Elemento com ID "${targetElementId}" não encontrado.`);
   }
@@ -55,9 +53,7 @@ function loadComponent(componentPath, targetElementId, callback) {
   // Para outros componentes, mantém o comportamento de fetch
   fetch(componentPath)
     .then(response => {
-      if (!response.ok) {
-        throw new Error(`Erro ao carregar componente: ${response.status}`);
-      }
+      if (!response.ok) throw new Error(`Erro ao carregar componente: ${response.status}`);
       return response.text();
     })
     .then(html => {
@@ -66,17 +62,11 @@ function loadComponent(componentPath, targetElementId, callback) {
         targetElement.innerHTML = html;
 
         // Se for navbar, marca link ativo
-        if (componentPath.includes('navbar')) {
-          markActiveNavLink();
-        }
+        if (componentPath.includes('navbar')) markActiveNavLink();
 
         // Executa callback se fornecido
-        if (callback && typeof callback === 'function') {
-          callback();
-        }
-      } else {
-        console.error(`Elemento com ID "${targetElementId}" não encontrado.`);
-      }
+        if (callback && typeof callback === 'function') callback();
+      } else console.error(`Elemento com ID "${targetElementId}" não encontrado.`);
     })
     .catch(error => {
       console.error(`Falha ao carregar o componente ${componentPath}:`, error);
@@ -106,9 +96,7 @@ function markActiveNavLink() {
   if (activeLink) activeLink.classList.add('active');
 }
 
-/**
- * Configura os botões de login e logout na navbar
- */
+// Configura os botões de login e logout na navbar
 function configurarBotoesAutenticacao() {
   const loginBtn = document.getElementById('nav-login-btn');
   const logoutBtn = document.getElementById('nav-logout-btn');
