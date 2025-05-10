@@ -9,7 +9,7 @@ const firebaseConfig = {
   measurementId: "G-WPLF4G1GFB"
 };
 
-// Inicialize o Firebase
+// Inicializa o Firebase
 firebase.initializeApp(firebaseConfig);
 
 // Referências ao Firestore e Storage

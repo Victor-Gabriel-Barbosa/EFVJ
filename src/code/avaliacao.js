@@ -14,9 +14,7 @@ async function carregarJogosSelect() {
 
     const snapshot = await jogosCollection.get();
 
-    if (snapshot.empty) {
-      return;
-    }
+    if (snapshot.empty) return;
 
     snapshot.forEach(doc => {
       const jogo = doc.data();
@@ -71,15 +69,12 @@ async function enviarAvaliacao(evento) {
   submitButton.textContent = 'Enviando...';
 
   try {
-    // Verificar se o usuário já avaliou este jogo
+    // Verifica se o usuário já avaliou este jogo
     const avaliacaoExistente = await verificarAvaliacaoExistente(jogoId, currentUser.uid);
 
-    if (avaliacaoExistente) {
-      mostrarResultado("Você já avaliou este jogo! Atualizamos sua avaliação.", false);
-      // A atualização da avaliação será feita abaixo
-    }
+    if (avaliacaoExistente) mostrarResultado("Você já avaliou este jogo! Atualizamos sua avaliação.", false);
 
-    // Coletar avaliações por categoria
+    // Coleta avaliações por categoria
     const avaliacoes = {};
     let somaAvaliacoes = 0;
     let categoriasAvaliadas = 0;
@@ -103,10 +98,10 @@ async function enviarAvaliacao(evento) {
     // Calcular média geral
     const mediaGeral = somaAvaliacoes / categoriasAvaliadas;
 
-    // Obter comentário
+    // Obtém comentário
     const comentario = document.getElementById('comment').value;
 
-    // Obter referência ao jogo
+    // Obtém referência ao jogo
     const jogoRef = jogosCollection.doc(jogoId);
     const jogoDoc = await jogoRef.get();
 
@@ -119,7 +114,7 @@ async function enviarAvaliacao(evento) {
 
     const jogo = jogoDoc.data();
 
-    // Criar documento de avaliação
+    // Cria documento de avaliação
     const avaliacaoData = {
       jogoId,
       jogoTitulo: jogo.titulo,
@@ -132,9 +127,9 @@ async function enviarAvaliacao(evento) {
       dataAvaliacao: firebase.firestore.FieldValue.serverTimestamp()
     };
 
-    // Salvar ou atualizar avaliação
+    // Salva ou atualiza avaliação
     if (avaliacaoExistente) {
-      // Buscar ID da avaliação existente
+      // Busca ID da avaliação existente
       const avaliacaoSnapshot = await avaliacoesCollection
         .where('jogoId', '==', jogoId)
         .where('userId', '==', currentUser.uid)

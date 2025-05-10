@@ -29,7 +29,7 @@ function loginWithGoogle() {
   
   // Iniciando o processo de login
   auth.signInWithPopup(googleProvider)
-    .then((result) => {
+    .then(() => {
       // Login bem-sucedido, usuário já está autenticado
       // O listener onAuthStateChanged será acionado automaticamente
     })
@@ -128,9 +128,7 @@ function loadUserGames(userId) {
         if (editBtn) {
           editBtn.addEventListener('click', () => {
             // Função para editar jogo (pode ser implementada no jogos-crud.js)
-            if (typeof openGameEditModal === 'function') {
-              openGameEditModal(doc.id);
-            }
+            if (typeof openGameEditModal === 'function') openGameEditModal(doc.id);
           });
         }
       });
@@ -196,9 +194,7 @@ function loadUserReviews(userId) {
 // Função auxiliar para gerar estrelas de avaliação
 function generateStarRating(rating) {
   let stars = '';
-  for (let i = 1; i <= 5; i++) {
-    stars += `<span class="pixel-star ${i <= rating ? 'filled' : ''}"></span>`;
-  }
+  for (let i = 1; i <= 5; i++) stars += `<span class="pixel-star ${i <= rating ? 'filled' : ''}"></span>`;
   return stars;
 }
 
@@ -211,13 +207,9 @@ function formatDate(date) {
 }
 
 // Adiciona os event listeners
-if (googleLoginBtn) {
-  googleLoginBtn.addEventListener('click', loginWithGoogle);
-}
+if (googleLoginBtn) googleLoginBtn.addEventListener('click', loginWithGoogle);
 
-if (logoutBtn) {
-  logoutBtn.addEventListener('click', logout);
-}
+if (logoutBtn) logoutBtn.addEventListener('click', logout);
 
 // Observador de mudança de estado de autenticação
 auth.onAuthStateChanged((user) => {
@@ -249,9 +241,7 @@ auth.onAuthStateChanged((user) => {
 // Inicialização - garante o estado correto da interface quando a página carrega
 document.addEventListener('DOMContentLoaded', function() {
   // Se o usuário não estiver logado, esconde a seção de perfil
-  if (!auth.currentUser) {
-    resetUIForLoggedOut();
-  }
+  if (!auth.currentUser) resetUIForLoggedOut();
 });
 
 // Exporta funções e variáveis para uso em outros arquivos

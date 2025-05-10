@@ -97,20 +97,13 @@ function markActiveNavLink() {
   // Adiciona classe 'active' ao link da página atual
   let navLinkId = '';
 
-  if (currentPage === 'index.html' || currentPage === '') {
-    navLinkId = 'nav-home';
-  } else if (currentPage === 'jogos.html') {
-    navLinkId = 'nav-games';
-  } else if (currentPage === 'avaliacao.html') {
-    navLinkId = 'nav-rating';
-  } else if (currentPage === 'usuario.html') {
-    navLinkId = 'nav-profile';
-  }
+  if (currentPage === 'index.html' || currentPage === '') navLinkId = 'nav-home';
+  else if (currentPage === 'jogos.html') navLinkId = 'nav-games';
+  else if (currentPage === 'avaliacao.html') navLinkId = 'nav-rating';
+  else if (currentPage === 'usuario.html') navLinkId = 'nav-profile';
 
   const activeLink = document.getElementById(navLinkId);
-  if (activeLink) {
-    activeLink.classList.add('active');
-  }
+  if (activeLink) activeLink.classList.add('active');
 }
 
 /**
@@ -119,14 +112,13 @@ function markActiveNavLink() {
 function configurarBotoesAutenticacao() {
   const loginBtn = document.getElementById('nav-login-btn');
   const logoutBtn = document.getElementById('nav-logout-btn');
-  
+
   if (loginBtn) {
-    loginBtn.addEventListener('click', function() {
+    loginBtn.addEventListener('click', function () {
       if (typeof firebase !== 'undefined' && firebase.auth) {
         // Verifica se temos a função de login definida em auth.js
-        if (window.userAuth && typeof window.userAuth.login === 'function') {
-          window.userAuth.login();
-        } else {
+        if (window.userAuth && typeof window.userAuth.login === 'function') window.userAuth.login();
+        else {
           // Fallback para login direto com Google
           const provider = new firebase.auth.GoogleAuthProvider();
           firebase.auth().signInWithPopup(provider);
@@ -137,27 +129,20 @@ function configurarBotoesAutenticacao() {
       }
     });
   }
-  
+
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', function() {
+    logoutBtn.addEventListener('click', function () {
       if (typeof firebase !== 'undefined' && firebase.auth) {
         // Verifica se temos a função de logout definida em auth.js
-        if (window.userAuth && typeof window.userAuth.logout === 'function') {
-          window.userAuth.logout();
-        } else {
-          // Fallback para logout direto
-          firebase.auth().signOut();
-        }
+        if (window.userAuth && typeof window.userAuth.logout === 'function') window.userAuth.logout();
+        else firebase.auth().signOut(); // Fallback para logout direto
       }
     });
   }
 }
 
 // Auto-inicialização quando o DOM estiver pronto
-document.addEventListener('DOMContentLoaded', function() {
+document.addEventListener('DOMContentLoaded', function () {
   // Verifica se o container da navbar existe na página
-  if (document.getElementById('navbar-container')) {
-    // Usa a função para criar a navbar dinamicamente
-    createNavbar('navbar-container');
-  }
+  if (document.getElementById('navbar-container')) createNavbar('navbar-container');
 });

@@ -16,15 +16,9 @@ document.addEventListener('DOMContentLoaded', function () {
     inicializarPaginaJogos();
   }
 
-  // Adicionar listeners comuns a todas as páginas
+  // Adiciona listeners comuns a todas as páginas
   adicionarListenersComuns();
 });
-
-// Configura os botões de login e logout na navbar
-function configurarBotoesAutenticacao() {
-  // Esta função agora é gerenciada pelo components.js
-  // Mantida aqui por compatibilidade com código existente
-}
 
 // Inicializa o Firebase e configurações relacionadas
 function inicializarFirebase() {
@@ -38,9 +32,7 @@ function inicializarFirebase() {
         atualizarStatusUsuario(user);
       });
     }
-  } else {
-    console.error('Firebase não inicializado corretamente!');
-  }
+  } else console.error('Firebase não inicializado corretamente!');
 }
 
 // Atualiza o status do usuário na interface
@@ -65,15 +57,12 @@ function atualizarStatusUsuario(user) {
   if (user) {
     // Usuário está logado
     userStatusElement.innerHTML = `
-            <div class="user-info">
-                <img src="${user.photoURL || 'https://via.placeholder.com/32?text=U'}" alt="${user.displayName}" class="user-avatar">
-                <span class="user-name">${user.displayName || 'Usuário'}</span>
-            </div>
-        `;
-  } else {
-    // Usuário não está logado
-    userStatusElement.innerHTML = '';
-  }
+      <div class="user-info">
+          <img src="${user.photoURL || 'https://via.placeholder.com/32?text=U'}" alt="${user.displayName}" class="user-avatar">
+          <span class="user-name">${user.displayName || 'Usuário'}</span>
+      </div>
+    `;
+  } else userStatusElement.innerHTML = ''; // Usuário não está logado
 }
 
 // Inicializa a página de jogos
@@ -82,16 +71,13 @@ function inicializarPaginaJogos() {
 
   // Verifica se o Firebase está disponível
   if (typeof firebase !== 'undefined' && firebase.apps.length) {
-    // Carregar jogos do Firestore (a função está em jogos-crud.js)
-    if (typeof carregarJogos === 'function') {
-      carregarJogos();
-    } else {
-      console.error('Função carregarJogos não encontrada!');
-    }
+    // Carrega jogos do Firestore (a função está em jogos-crud.js)
+    if (typeof carregarJogos === 'function') carregarJogos();
+    else console.error('Função carregarJogos não encontrada!');
   } else {
     console.error('Firebase não inicializado corretamente!');
 
-    // Exibir mensagem de erro na interface
+    // Exibe mensagem de erro na interface
     const jogosGrid = document.querySelector('.games-grid');
     if (jogosGrid) {
       jogosGrid.innerHTML = '<p class="error-message">Erro ao conectar com o Firebase. Por favor, verifique sua conexão.</p>';
@@ -114,14 +100,14 @@ function adicionarListenersComuns() {
     });
   });
 
-  // Configurar eventos de autenticação
+  // Configura eventos de autenticação
   document.addEventListener('userAuthenticated', (event) => {
-    // Atualizar status do usuário quando o evento for disparado
+    // Atualiza status do usuário quando o evento for disparado
     atualizarStatusUsuario(event.detail);
   });
 
   document.addEventListener('userLoggedOut', () => {
-    // Atualizar status quando o usuário fizer logout
+    // Atualiza status quando o usuário fizer logout
     atualizarStatusUsuario(null);
   });
 }
