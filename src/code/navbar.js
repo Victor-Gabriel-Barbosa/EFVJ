@@ -23,8 +23,8 @@ function createNavbar(targetElementId, callback) {
         <li><a href="jogos.html" class="pixel-button" id="nav-games">Jogos</a></li>
         <li><a href="avaliacao.html" class="pixel-button" id="nav-rating">Avaliação</a></li>
         <li><a href="usuario.html" class="pixel-button" id="nav-profile">Meu Perfil</a></li>
-        <li><button id="nav-login-btn" class="pixel-button login-btn">Entrar</button></li>
-        <li><button id="nav-logout-btn" class="pixel-button logout-btn" style="display: none;">Sair</button></li>
+        <li><a href="#" id="nav-login-btn" class="pixel-button">Entrar</a></li>
+        <li><a href="#" id="nav-logout-btn" class="pixel-button" style="display: none;">Sair</a></li>
       </ul>
     </nav>
   `;
@@ -112,7 +112,8 @@ function configurarBotoesAutenticacao() {
   const logoutBtn = document.getElementById('nav-logout-btn');
 
   if (loginBtn) {
-    loginBtn.addEventListener('click', function () {
+    loginBtn.addEventListener('click', function (e) {
+      e.preventDefault(); // Previne o comportamento padrão do link
       if (typeof firebase !== 'undefined' && firebase.auth) {
         // Verifica se temos a função de login definida em auth.js
         if (window.userAuth && typeof window.userAuth.login === 'function') window.userAuth.login();
@@ -129,7 +130,8 @@ function configurarBotoesAutenticacao() {
   }
 
   if (logoutBtn) {
-    logoutBtn.addEventListener('click', function () {
+    logoutBtn.addEventListener('click', function (e) {
+      e.preventDefault(); // Previne o comportamento padrão do link
       if (typeof firebase !== 'undefined' && firebase.auth) {
         // Verifica se temos a função de logout definida em auth.js
         if (window.userAuth && typeof window.userAuth.logout === 'function') window.userAuth.logout();

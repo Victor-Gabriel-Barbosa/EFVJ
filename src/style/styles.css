@@ -29,14 +29,15 @@ body {
 }
 
 /* Botões de autenticação na navbar */
-.login-btn {
+#nav-login-btn {
   background-color: var(--accent);
   color: var(--dark);
   font-weight: bold;
 }
 
-.logout-btn {
+#nav-logout-btn {
   background-color: var(--danger);
+  color: var(--light);
 }
 
 .user-info {
@@ -313,7 +314,6 @@ body {
 }
 
 .create-icon {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAABAAAAAQCAYAAAAf8/9hAAAANklEQVR42mNgGPKAmZGR8T8lGKyhQUdHB0UMJkbVADIMwGcIMo3XAFININkLlAYiySGJrAQHAD8zX9pRTTwMAAAAAElFTkSuQmCC');
 }
 
 .play-icon {
