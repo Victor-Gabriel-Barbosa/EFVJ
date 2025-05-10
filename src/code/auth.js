@@ -54,20 +54,20 @@ function logout() {
 
 // Função para exibir os dados do usuário logado
 function displayUserProfile(user) {
-  // Atualiza a interface para mostrar os dados do usuário
-  userName.textContent = user.displayName || 'Usuário';
-  userEmail.textContent = user.email || '';
-  userAvatar.src = user.photoURL || 'https://via.placeholder.com/100?text=Avatar';
+  // Atualiza a interface para mostrar os dados do usuário, verificando se os elementos existem
+  if (userName) userName.textContent = user.displayName || 'Usuário';
+  if (userEmail) userEmail.textContent = user.email || '';
+  if (userAvatar) userAvatar.src = user.photoURL || 'https://via.placeholder.com/100?text=Avatar';
   
-  // Esconde a seção de login e mostra o perfil
-  loginSection.classList.add('hidden');
-  profileSection.classList.remove('hidden');
+  // Esconde a seção de login e mostra o perfil apenas se os elementos existirem
+  if (loginSection) loginSection.classList.add('hidden');
+  if (profileSection) profileSection.classList.remove('hidden');
   
-  // Carrega os jogos do usuário
-  loadUserGames(user.uid);
+  // Carrega os jogos do usuário apenas se o elemento existir
+  if (userGames) loadUserGames(user.uid);
   
-  // Carrega as avaliações do usuário
-  loadUserReviews(user.uid);
+  // Carrega as avaliações do usuário apenas se o elemento existir
+  if (userReviews) loadUserReviews(user.uid);
 }
 
 // Função para resetar a interface quando não há usuário logado
@@ -91,6 +91,9 @@ function resetUIForLoggedOut() {
 
 // Função para carregar os jogos do usuário
 function loadUserGames(userId) {
+  // Verifica se o elemento userGames existe antes de prosseguir
+  if (!userGames) return;
+  
   // Consulta os jogos no Firestore onde o autor é o usuário atual
   jogosCollection.where('autorId', '==', userId)
     .get()
@@ -141,6 +144,9 @@ function loadUserGames(userId) {
 
 // Função para carregar as avaliações do usuário
 function loadUserReviews(userId) {
+  // Verifica se o elemento userReviews existe antes de prosseguir
+  if (!userReviews) return;
+  
   // Implementação para carregar avaliações do Firebase
   // Esta é uma versão básica, você pode expandir conforme necessário
   const avaliacoesCollection = db.collection('avaliacoes');
