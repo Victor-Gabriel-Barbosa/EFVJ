@@ -55,19 +55,19 @@ function logout() {
 // Função para exibir os dados do usuário logado
 function displayUserProfile(user) {
   // Atualiza a interface para mostrar os dados do usuário
-  if (userName) userName.textContent = user.displayName || 'Usuário';
-  if (userEmail) userEmail.textContent = user.email || '';
-  if (userAvatar) userAvatar.src = user.photoURL || 'https://via.placeholder.com/100?text=Avatar';
+  userName.textContent = user.displayName || 'Usuário';
+  userEmail.textContent = user.email || '';
+  userAvatar.src = user.photoURL || 'https://via.placeholder.com/100?text=Avatar';
   
   // Esconde a seção de login e mostra o perfil
-  if (loginSection) loginSection.classList.add('hidden');
-  if (profileSection) profileSection.classList.remove('hidden');
+  loginSection.classList.add('hidden');
+  profileSection.classList.remove('hidden');
   
-  // Carrega os jogos do usuário apenas se o elemento existir
-  if (userGames) loadUserGames(user.uid);
+  // Carrega os jogos do usuário
+  loadUserGames(user.uid);
   
-  // Carrega as avaliações do usuário apenas se o elemento existir
-  if (userReviews) loadUserReviews(user.uid);
+  // Carrega as avaliações do usuário
+  loadUserReviews(user.uid);
 }
 
 // Função para resetar a interface quando não há usuário logado
@@ -91,9 +91,6 @@ function resetUIForLoggedOut() {
 
 // Função para carregar os jogos do usuário
 function loadUserGames(userId) {
-  // Se o elemento userGames não existir, não faz nada
-  if (!userGames) return;
-  
   // Consulta os jogos no Firestore onde o autor é o usuário atual
   jogosCollection.where('autorId', '==', userId)
     .get()
@@ -138,15 +135,12 @@ function loadUserGames(userId) {
     })
     .catch((error) => {
       console.error("Erro ao carregar jogos do usuário:", error);
-      if (userGames) userGames.innerHTML = '<p class="error-message">Erro ao carregar seus jogos. Tente novamente mais tarde.</p>';
+      userGames.innerHTML = '<p class="error-message">Erro ao carregar seus jogos. Tente novamente mais tarde.</p>';
     });
 }
 
 // Função para carregar as avaliações do usuário
 function loadUserReviews(userId) {
-  // Se o elemento userReviews não existir, não faz nada
-  if (!userReviews) return;
-  
   // Implementação para carregar avaliações do Firebase
   // Esta é uma versão básica, você pode expandir conforme necessário
   const avaliacoesCollection = db.collection('avaliacoes');
@@ -193,7 +187,7 @@ function loadUserReviews(userId) {
     })
     .catch((error) => {
       console.error("Erro ao carregar avaliações do usuário:", error);
-      if (userReviews) userReviews.innerHTML = '<p class="error-message">Erro ao carregar suas avaliações. Tente novamente mais tarde.</p>';
+      userReviews.innerHTML = '<p class="error-message">Erro ao carregar suas avaliações. Tente novamente mais tarde.</p>';
     });
 }
 
