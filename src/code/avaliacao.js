@@ -1,8 +1,5 @@
 // Funções para manipulação de avaliações no Firestore
 
-// Referência à coleção de avaliações
-const avaliacoesCollection = db.collection('avaliacoes');
-
 // Categorias de avaliação disponíveis
 const categorias = ['gameplay', 'visual', 'som', 'originalidade'];
 
