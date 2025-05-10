@@ -422,10 +422,14 @@ document.addEventListener('DOMContentLoaded', () => {
   // Configurar listener para botão de adicionar jogo
   const addButton = document.querySelector('.add-game-btn');
   if (addButton) {
+    console.log('Botão de adicionar jogo encontrado:', addButton);
     addButton.addEventListener('click', (e) => {
       e.preventDefault();
+      console.log('Clique no botão de adicionar jogo detectado');
       abrirModal();
     });
+  } else {
+    console.error('Botão de adicionar jogo não encontrado na página!');
   }
 
   // Configurar listener para formulário
@@ -448,7 +452,10 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Mostra o botão de adicionar jogo
     const addBtn = document.querySelector('.add-game-btn');
-    if (addBtn) addBtn.style.display = 'inline-block';
+    if (addBtn) {
+      addBtn.style.display = 'inline-block';
+      console.log('Usuário autenticado, botão visível');
+    }
   });
 
   document.addEventListener('userLoggedOut', () => {
@@ -457,11 +464,24 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Esconde o botão de adicionar jogo se necessário
     const addBtn = document.querySelector('.add-game-btn');
-    if (addBtn) addBtn.style.display = 'none';
+    if (addBtn) {
+      addBtn.style.display = 'none';
+      console.log('Usuário deslogado, botão oculto');
+    }
   });
 
   // Verifica se o usuário está logado ao carregar a página
   const currentUser = window.userAuth?.currentUser();
   const addBtn = document.querySelector('.add-game-btn');
-  if (addBtn) addBtn.style.display = currentUser ? 'inline-block' : 'none';
+  
+  if (addBtn) {
+    // Forçar exibição do botão se estiver logado
+    if (currentUser) {
+      addBtn.style.display = 'inline-block';
+      console.log('Usuário logado, botão visível na inicialização');
+    } else {
+      addBtn.style.display = 'none';
+      console.log('Usuário não logado, botão oculto na inicialização');
+    }
+  }
 });
