@@ -40,7 +40,6 @@ function createNavbar(targetElementId, callback) {
           <!-- Informações do usuário logado -->
           <div class="user-nav-info" style="display: none;">
             <img id="nav-user-avatar" src="" alt="Avatar do usuário" class="nav-avatar">
-            <span id="nav-user-name" class="nav-username">Usuário</span>
           </div>
           
           <!-- Botões de autenticação -->
@@ -136,7 +135,6 @@ function configurarBotoesAutenticacao() {
   const logoutBtn = document.getElementById('nav-logout-btn');
   const userNavInfo = document.querySelector('.user-nav-info');
   const userAvatar = document.getElementById('nav-user-avatar');
-  const userName = document.getElementById('nav-user-name');
 
   if (loginBtn) {
     loginBtn.addEventListener('click', function (e) {
@@ -152,7 +150,6 @@ function configurarBotoesAutenticacao() {
             if (user) {
               userNavInfo.style.display = 'flex';
               userAvatar.src = user.photoURL || '';
-              userName.textContent = user.displayName || 'Usuário';
               loginBtn.style.display = 'none';
               logoutBtn.style.display = 'block';
             }
@@ -174,7 +171,6 @@ function configurarBotoesAutenticacao() {
         else firebase.auth().signOut().then(() => {
           userNavInfo.style.display = 'none';
           userAvatar.src = '';
-          userName.textContent = 'Usuário';
           loginBtn.style.display = 'block';
           logoutBtn.style.display = 'none';
         }); // Fallback para logout direto
