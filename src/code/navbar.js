@@ -11,6 +11,7 @@
 function createNavbar(targetElementId, callback) {
   const navbarHTML = `
     <nav class="game-nav">
+      <!-- Botão de menu mobile -->
       <button class="mobile-menu-toggle" aria-label="Menu">
         <div class="hamburger-icon">
           <span></span>
@@ -18,19 +19,36 @@ function createNavbar(targetElementId, callback) {
           <span></span>
         </div>
       </button>
-      <ul class="nav-menu">
-        <li><a href="index.html" class="pixel-button" id="nav-home">Início</a></li>
-        <li><a href="jogos.html" class="pixel-button" id="nav-games">Jogos</a></li>
-        <li><a href="avaliacao.html" class="pixel-button" id="nav-rating">Avaliação</a></li>
-        <li><a href="usuario.html" class="pixel-button" id="nav-profile">Meu Perfil</a></li>
-      </ul>
-      <div class="user-nav-info" style="display: none;">
-        <img id="nav-user-avatar" src="" alt="Avatar do usuário" class="nav-avatar">
-        <span id="nav-user-name" class="nav-username">Usuário</span>
+      
+      <!-- Logo ou título do site (pode ser adicionado) -->
+      <div class="nav-brand">
+        <a href="index.html">EFVJ</a>
       </div>
-      <div class="auth-buttons">
-        <a href="#" id="nav-login-btn" class="pixel-button">Entrar</a>
-        <a href="#" id="nav-logout-btn" class="pixel-button" style="display: none;">Sair</a>
+      
+      <!-- Container principal - organiza menu e área do usuário -->
+      <div class="nav-container">
+        <!-- Links de navegação -->
+        <ul class="nav-menu">
+          <li><a href="index.html" class="pixel-button" id="nav-home">Início</a></li>
+          <li><a href="jogos.html" class="pixel-button" id="nav-games">Jogos</a></li>
+          <li><a href="avaliacao.html" class="pixel-button" id="nav-rating">Avaliação</a></li>
+          <li><a href="usuario.html" class="pixel-button" id="nav-profile">Meu Perfil</a></li>
+        </ul>
+        
+        <!-- Área do usuário -->
+        <div class="user-area">
+          <!-- Informações do usuário logado -->
+          <div class="user-nav-info" style="display: none;">
+            <img id="nav-user-avatar" src="" alt="Avatar do usuário" class="nav-avatar">
+            <span id="nav-user-name" class="nav-username">Usuário</span>
+          </div>
+          
+          <!-- Botões de autenticação -->
+          <div class="auth-buttons">
+            <a href="#" id="nav-login-btn" class="pixel-button">Entrar</a>
+            <a href="#" id="nav-logout-btn" class="pixel-button" style="display: none;">Sair</a>
+          </div>
+        </div>
       </div>
     </nav>
   `;
