@@ -61,6 +61,31 @@ body {
   color: var(--light);
 }
 
+/* Estilo para informações do usuário na navbar */
+.user-nav-info {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin: 0 15px;
+}
+
+.nav-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  border: 2px solid var(--accent);
+  object-fit: cover;
+}
+
+.nav-username {
+  font-size: 0.7rem;
+  color: var(--light);
+  max-width: 120px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 /* Containers e layout */
 .game-container {
   max-width: 1200px;
@@ -74,7 +99,7 @@ body {
   margin-bottom: 30px;
 }
 
-/* Estilos para navbar responsiva */
+/* Ajustes no layout da navbar */
 .game-nav {
   margin-bottom: 30px;
   position: fixed;
@@ -87,8 +112,9 @@ body {
   border-bottom: 3px solid var(--primary);
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
+  padding: 10px 20px;
 }
 
 .nav-menu {
@@ -96,6 +122,11 @@ body {
   justify-content: center;
   list-style: none;
   gap: 20px;
+}
+
+.auth-buttons {
+  display: flex;
+  gap: 10px;
 }
 
 .mobile-menu-toggle {

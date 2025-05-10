@@ -23,9 +23,15 @@ function createNavbar(targetElementId, callback) {
         <li><a href="jogos.html" class="pixel-button" id="nav-games">Jogos</a></li>
         <li><a href="avaliacao.html" class="pixel-button" id="nav-rating">Avaliação</a></li>
         <li><a href="usuario.html" class="pixel-button" id="nav-profile">Meu Perfil</a></li>
-        <li><a href="#" id="nav-login-btn" class="pixel-button">Entrar</a></li>
-        <li><a href="#" id="nav-logout-btn" class="pixel-button" style="display: none;">Sair</a></li>
       </ul>
+      <div class="user-nav-info" style="display: none;">
+        <img id="nav-user-avatar" src="" alt="Avatar do usuário" class="nav-avatar">
+        <span id="nav-user-name" class="nav-username">Usuário</span>
+      </div>
+      <div class="auth-buttons">
+        <a href="#" id="nav-login-btn" class="pixel-button">Entrar</a>
+        <a href="#" id="nav-logout-btn" class="pixel-button" style="display: none;">Sair</a>
+      </div>
     </nav>
   `;
 
@@ -110,6 +116,9 @@ function markActiveNavLink() {
 function configurarBotoesAutenticacao() {
   const loginBtn = document.getElementById('nav-login-btn');
   const logoutBtn = document.getElementById('nav-logout-btn');
+  const userNavInfo = document.querySelector('.user-nav-info');
+  const userAvatar = document.getElementById('nav-user-avatar');
+  const userName = document.getElementById('nav-user-name');
 
   if (loginBtn) {
     loginBtn.addEventListener('click', function (e) {
@@ -120,7 +129,16 @@ function configurarBotoesAutenticacao() {
         else {
           // Fallback para login direto com Google
           const provider = new firebase.auth.GoogleAuthProvider();
-          firebase.auth().signInWithPopup(provider);
+          firebase.auth().signInWithPopup(provider).then(result => {
+            const user = result.user;
+            if (user) {
+              userNavInfo.style.display = 'flex';
+              userAvatar.src = user.photoURL || '';
+              userName.textContent = user.displayName || 'Usuário';
+              loginBtn.style.display = 'none';
+              logoutBtn.style.display = 'block';
+            }
+          });
         }
       } else {
         console.error('Firebase Auth não disponível');
@@ -135,7 +153,13 @@ function configurarBotoesAutenticacao() {
       if (typeof firebase !== 'undefined' && firebase.auth) {
         // Verifica se temos a função de logout definida em auth.js
         if (window.userAuth && typeof window.userAuth.logout === 'function') window.userAuth.logout();
-        else firebase.auth().signOut(); // Fallback para logout direto
+        else firebase.auth().signOut().then(() => {
+          userNavInfo.style.display = 'none';
+          userAvatar.src = '';
+          userName.textContent = 'Usuário';
+          loginBtn.style.display = 'block';
+          logoutBtn.style.display = 'none';
+        }); // Fallback para logout direto
       }
     });
   }

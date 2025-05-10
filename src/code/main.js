@@ -40,15 +40,28 @@ function atualizarStatusUsuario(user) {
   const userStatusElement = document.getElementById('user-status');
   const loginBtn = document.getElementById('nav-login-btn');
   const logoutBtn = document.getElementById('nav-logout-btn');
+  const userNavInfo = document.querySelector('.user-nav-info');
+  const navUserAvatar = document.getElementById('nav-user-avatar');
+  const navUserName = document.getElementById('nav-user-name');
 
-  // Atualiza botões na navbar
+  // Atualiza botões e informações do usuário na navbar
   if (loginBtn && logoutBtn) {
     if (user) {
       loginBtn.style.display = 'none';
       logoutBtn.style.display = 'inline-block';
+      
+      // Exibe e atualiza as informações do usuário na navbar
+      if (userNavInfo) userNavInfo.style.display = 'flex';
+      if (navUserAvatar) navUserAvatar.src = user.photoURL || 'https://via.placeholder.com/32?text=U';
+      if (navUserName) navUserName.textContent = user.displayName || 'Usuário';
     } else {
       loginBtn.style.display = 'inline-block';
       logoutBtn.style.display = 'none';
+      
+      // Oculta as informações do usuário na navbar
+      if (userNavInfo) userNavInfo.style.display = 'none';
+      if (navUserAvatar) navUserAvatar.src = '';
+      if (navUserName) navUserName.textContent = 'Usuário';
     }
   }
 
