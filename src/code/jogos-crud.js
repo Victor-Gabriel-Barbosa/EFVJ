@@ -39,10 +39,7 @@ async function carregarJogos() {
 
     // Reaplica os filtros se necessário
     const filtroAtivo = document.querySelector('.filter-btn.active');
-    if (filtroAtivo && filtroAtivo.dataset.filter !== 'all') {
-      filtrarJogos(filtroAtivo.dataset.filter);
-    }
-
+    if (filtroAtivo && filtroAtivo.dataset.filter !== 'all') filtrarJogos(filtroAtivo.dataset.filter);
   } catch (error) {
     console.error("Erro ao carregar jogos:", error);
   }
@@ -135,54 +132,32 @@ async function adicionarJogo(evento) {
   }
 
   const formulario = document.getElementById('form-jogo');
-  if (!formulario) {
-    console.error("Formulário de jogo não encontrado.");
-    alert("Erro ao acessar o formulário. Por favor, recarregue a página e tente novamente.");
-    return;
-  }
-
   const btnSubmit = formulario.querySelector('button[type="submit"]');
-  if (!btnSubmit) {
-    console.error("Botão de submit não encontrado no formulário.");
-    return;
-  }
+
   try {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Salvando...';
-    
-    // Obtém valores do formulário com verificações de segurança
-    if (!formulario.titulo || !formulario.categoria || !formulario.linkJogo) {
-      throw new Error("Campos obrigatórios do formulário não encontrados");
-    }
-    
+    btnSubmit.textContent = 'Salvando...'; 
+
+    // Obtém valores do formulário
     const titulo = formulario.titulo.value;
-    const autor = formulario.autor && formulario.autor.value ? formulario.autor.value : currentUser.displayName;
+    const autor = formulario.autor.value || currentUser.displayName;
     const categoria = formulario.categoria.value;
-    const linkJogo = formulario.linkJogo.value;// Upload da thumbnail se fornecida
+    const linkJogo = formulario.linkJogo.value;
+
+    // Upload da thumbnail se fornecida
     let thumbnailUrl = 'assets/default-game.png';
     const thumbnailInput = formulario.thumbnail;
 
-    try {
-      if (thumbnailInput && thumbnailInput.files && thumbnailInput.files.length > 0) {
-        const file = thumbnailInput.files[0];
-        const filename = `${Date.now()}_${file.name}`;
-        
-        // Verifica se o storage está disponível
-        if (!storage) {
-          console.error("Firebase Storage não está inicializado");
-          throw new Error("Erro ao acessar o Firebase Storage");
-        }
-        
-        const storageRef = storage.ref(`thumbnails/${filename}`);
-        
-        // Usar os metadados customizados para resolver problema de CORS
-        await storageRef.put(file, metadataStorage);
-        thumbnailUrl = await storageRef.getDownloadURL();
-      }
-    } catch (uploadError) {
-      console.error("Erro ao fazer upload da imagem:", uploadError);
-      throw new Error("Falha ao fazer upload da imagem. Por favor, tente novamente.");
-    }// Criar documento no Firestore com os dados do usuário
+    if (thumbnailInput.files.length > 0) {
+      const file = thumbnailInput.files[0];
+      const filename = `${Date.now()}_${file.name}`;
+      const storageRef = storage.ref(`thumbnails/${filename}`);
+      
+      // Usa os metadados customizados para resolver problema de CORS
+      await storageRef.put(file, metadataStorage);
+      thumbnailUrl = await storageRef.getDownloadURL();
+    }    
+    // Cria documento no Firestore com os dados do usuário
     await jogosCollection.add({
       titulo,
       autor,
@@ -196,12 +171,11 @@ async function adicionarJogo(evento) {
       dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
     });
 
-    // Recarregar jogos e fechar modal
+    // Recarrega jogos e fecha modal
     await carregarJogos();
     fecharModal();
 
     alert('Jogo adicionado com sucesso!');
-
   } catch (error) {
     console.error("Erro ao adicionar jogo:", error);
     alert("Erro ao adicionar jogo. Por favor, tente novamente.");
@@ -253,7 +227,6 @@ async function abrirFormularioEdicao(jogoId) {
 
     // Exibe o modal
     abrirModal();
-
   } catch (error) {
     console.error("Erro ao carregar jogo para edição:", error);
     alert("Erro ao carregar jogo para edição. Por favor, tente novamente.");
@@ -285,7 +258,9 @@ async function atualizarJogo(evento, jogoId) {
 
   try {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Atualizando...';    // Obtém valores do formulário
+    btnSubmit.textContent = 'Atualizando...';    
+    
+    // Obtém valores do formulário
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value;
     const categoria = formulario.categoria.value;
@@ -307,7 +282,7 @@ async function atualizarJogo(evento, jogoId) {
       const filename = `${Date.now()}_${file.name}`;
       const storageRef = storage.ref(`thumbnails/${filename}`);
       
-      // Usar os metadados customizados para resolver problema de CORS
+      // Usa os metadados customizados para resolver problema de CORS
       await storageRef.put(file, metadataStorage);
       dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
     }
@@ -320,7 +295,6 @@ async function atualizarJogo(evento, jogoId) {
     fecharModal();
 
     alert('Jogo atualizado com sucesso!');
-
   } catch (error) {
     console.error("Erro ao atualizar jogo:", error);
     alert("Erro ao atualizar jogo. Por favor, tente novamente.");
@@ -413,12 +387,12 @@ function fecharModal() {
   modal.style.display = 'none';
   document.body.style.overflow = 'auto';
 
-  // Resetar formulário
+  // Reseta formulário
   document.getElementById('form-jogo').reset();
   document.querySelector('.form-title').textContent = 'Adicionar Novo Jogo';
   document.querySelector('button[type="submit"]').textContent = 'Salvar Jogo';
 
-  // Remover campo de ID se existir
+  // Remove campo de ID se existir
   const idInput = document.querySelector('input[name="jogoId"]');
   if (idInput) idInput.remove();
 }
@@ -427,33 +401,22 @@ function fecharModal() {
 function salvarJogo(evento) {
   evento.preventDefault();
 
-  try {
-    const formulario = document.getElementById('form-jogo');
-    if (!formulario) {
-      console.error("Formulário não encontrado");
-      alert("Erro ao encontrar o formulário. Por favor, recarregue a página.");
-      return;
-    }
-    
-    const jogoId = formulario.querySelector('input[name="jogoId"]')?.value;
+  const formulario = document.getElementById('form-jogo');
+  const jogoId = formulario.querySelector('input[name="jogoId"]')?.value;
 
-    (jogoId) ? atualizarJogo(evento, jogoId) : adicionarJogo(evento);
-  } catch (err) {
-    console.error("Erro ao processar formulário:", err);
-    alert("Erro ao processar o formulário: " + err.message);
-  }
+  (jogoId) ? atualizarJogo(evento, jogoId) : adicionarJogo(evento);
 }
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-  // Verifica se estamos na página de jogos antes de inicializar funcionalidades específicas
+  // Verifica se está na página de jogos antes de inicializar funcionalidades específicas
   const isJogosPage = window.location.pathname.includes('jogos.html');
   
   // Carrega jogos apenas se estiver na página de jogos
   if (isJogosPage) {
     carregarJogos();
     
-    // Configurar listeners para filtros
+    // Configura listeners para filtros
     document.querySelectorAll('.filter-btn').forEach(btn => {
       btn.addEventListener('click', (e) => {
         document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
@@ -462,7 +425,7 @@ document.addEventListener('DOMContentLoaded', () => {
       });
     });
     
-    // Configurar listener para botão de adicionar jogo
+    // Configura listener para botão de adicionar jogo
     const addButton = document.querySelector('.add-game-btn');
     if (addButton) {
       console.log('Botão de adicionar jogo encontrado:', addButton);
@@ -471,18 +434,16 @@ document.addEventListener('DOMContentLoaded', () => {
         console.log('Clique no botão de adicionar jogo detectado');
         abrirModal();
       });
-    } else {
-      console.error('Botão de adicionar jogo não encontrado na página de jogos!');
-    }
+    } else console.error('Botão de adicionar jogo não encontrado na página de jogos!');
   }
 
-  // Configurar listeners apenas se estiver na página de jogos
+  // Configura listeners apenas se estiver na página de jogos
   if (isJogosPage) {
-    // Configurar listener para formulário
+    // Configura listener para formulário
     const formulario = document.getElementById('form-jogo');
     if (formulario) formulario.addEventListener('submit', salvarJogo);
 
-    // Configurar listeners para fechar modal
+    // Configura listeners para fechar modal
     const closeButtons = document.querySelectorAll('.close-modal, .cancel-btn');
     closeButtons.forEach(btn => {
       btn.addEventListener('click', (e) => {
@@ -495,9 +456,7 @@ document.addEventListener('DOMContentLoaded', () => {
   // Escuta eventos de autenticação (isso pode ser útil em qualquer página)
   document.addEventListener('userAuthenticated', () => {
     // Atualiza a interface quando um usuário faz login
-    if (isJogosPage) {
-      carregarJogos();
-    }
+    if (isJogosPage) carregarJogos();
 
     // Mostra o botão de adicionar jogo
     const addBtn = document.querySelector('.add-game-btn');
@@ -524,7 +483,7 @@ document.addEventListener('DOMContentLoaded', () => {
   const addBtn = document.querySelector('.add-game-btn');
   
   if (addBtn) {
-    // Forçar exibição do botão se estiver logado
+    // Força exibição do botão se estiver logado
     if (currentUser) {
       addBtn.style.display = 'inline-block';
       console.log('Usuário logado, botão visível na inicialização');

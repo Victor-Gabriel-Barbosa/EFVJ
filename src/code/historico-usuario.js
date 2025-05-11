@@ -159,11 +159,8 @@ function updateLastLoginTime(userId) {
         const userData = doc.data();
         const lastLogin = userData.ultimoAcesso?.toDate();
         
-        if (lastLogin) {
-          lastLoginTime.textContent = `Último acesso: ${formatDateTime(lastLogin)}`;
-        } else {
-          lastLoginTime.textContent = 'Primeiro acesso hoje';
-        }
+        if (lastLogin) lastLoginTime.textContent = `Último acesso: ${formatDateTime(lastLogin)}`;
+        else lastLoginTime.textContent = 'Primeiro acesso hoje';
         
         // Atualiza o timestamp do último acesso
         usuariosCollection.doc(userId).update({
@@ -234,9 +231,6 @@ function loadUserAchievements(userId) {
 
 // Função para verificar e atribuir conquistas ao usuário
 function checkAndAssignAchievements(userId) {
-  // Esta função verificaria condições para desbloquear conquistas
-  // Para simplificar, vamos apenas criar algumas conquistas básicas para o usuário
-  
   // Define as conquistas padrão (iniciais)
   const conquistasPadrao = [
     {
@@ -500,9 +494,7 @@ function verifyGameAchievements(userId) {
           if (conquistasDesbloqueadas > 0) {
             batch.commit().then(() => {
               console.log(`${conquistasDesbloqueadas} conquistas desbloqueadas`);
-              if (auth.currentUser && auth.currentUser.uid === userId) {
-                loadUserAchievements(userId);
-              }
+              if (auth.currentUser && auth.currentUser.uid === userId) loadUserAchievements(userId);
             });
           }
         });
@@ -549,9 +541,7 @@ function verifyReviewAchievements(userId) {
           if (conquistasDesbloqueadas > 0) {
             batch.commit().then(() => {
               console.log(`${conquistasDesbloqueadas} conquistas desbloqueadas`);
-              if (auth.currentUser && auth.currentUser.uid === userId) {
-                loadUserAchievements(userId);
-              }
+              if (auth.currentUser && auth.currentUser.uid === userId) loadUserAchievements(userId);
             });
           }
         });

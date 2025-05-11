@@ -16,10 +16,8 @@ function loadRecentInteractions() {
   if (!interacoesContainer) return;
   
   interacoesContainer.innerHTML = '<p class="loading-message">Carregando interações recentes...</p>';
-    // Busca atividades recentes
-  // IMPORTANTE: Esta consulta requer um índice composto no Firestore.
-  // Acesse o link fornecido no erro para criar o índice necessário:
-  // https://console.firebase.google.com/v1/r/project/eufacovcjoga/firestore/indexes?create_composite=Ck9wcm9qZWN0cy9ldWZhY292Y2pvZ2EvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL2F0aXZpZGFkZXMvaW5kZXhlcy9fEAEaCAoEdGlwbxABGggKBGRhdGEQAhoMCghfX25hbWVfXxAC
+  
+  // Busca atividades recentes
   atividadesCollection
     .where('tipo', 'in', ['avaliacao', 'cadastro_jogo', 'comentario'])
     .orderBy('data', 'desc')
@@ -101,16 +99,12 @@ function loadRecentInteractions() {
 
 // Carrega interações quando a página for carregada
 document.addEventListener('DOMContentLoaded', () => {
-  // Verifica se estamos na página principal ou de perfil
-  if (interacoesContainer) {
-    loadRecentInteractions();
-  }
+  // Verifica se está na página principal ou de perfil
+  if (interacoesContainer) loadRecentInteractions();
 });
 
 // Atualiza as interações a cada 5 minutos, se o usuário estiver na página
-if (interacoesContainer) {
-  setInterval(loadRecentInteractions, 5 * 60 * 1000);
-}
+if (interacoesContainer) setInterval(loadRecentInteractions, 5 * 60 * 1000);
 
 // Exporta a função para uso em outros arquivos
 window.interacoes = {

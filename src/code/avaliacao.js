@@ -22,7 +22,6 @@ async function carregarJogosSelect() {
       option.textContent = jogo.titulo;
       gameSelect.appendChild(option);
     });
-
   } catch (error) {
     console.error("Erro ao carregar jogos:", error);
     alert("Erro ao carregar jogos. Por favor, tente novamente.");
@@ -71,7 +70,7 @@ async function enviarAvaliacao(evento) {
 
     if (avaliacaoExistente) mostrarResultado("Você já avaliou este jogo! Atualizamos sua avaliação.", false);
 
-  // Coleta avaliações por categoria
+    // Coleta avaliações por categoria
     const avaliacoes = {};
     let somaAvaliacoes = 0;
     let categoriasAvaliadas = 0;
@@ -93,7 +92,7 @@ async function enviarAvaliacao(evento) {
       return;
     }
 
-    // Calcular média geral
+    // Calcula média geral
     const mediaGeral = somaAvaliacoes / categoriasAvaliadas;
 
     // Obtém comentário
@@ -135,22 +134,19 @@ async function enviarAvaliacao(evento) {
 
       const avaliacaoId = avaliacaoSnapshot.docs[0].id;
       await avaliacoesCollection.doc(avaliacaoId).update(avaliacaoData);
-    } else {
-      await avaliacoesCollection.add(avaliacaoData);
-    }
+    } else await avaliacoesCollection.add(avaliacaoData);
 
-    // Atualizar a avaliação média do jogo
+    // Atualiza a avaliação média do jogo
     await atualizarMediaJogo(jogoId);
 
-    // Resetar formulário
+    // Reseta formulário
     resetarFormulario();
 
-    // Mostrar resultado
+    // Mostra resultado
     mostrarResultado("Avaliação enviada com sucesso!", false);
 
-    // Atualizar ranking
+    // Atualiza ranking
     await carregarRanking();
-
   } catch (error) {
     console.error("Erro ao enviar avaliação:", error);
     mostrarResultado("Erro ao enviar avaliação. Por favor, tente novamente.", true);
@@ -163,53 +159,49 @@ async function enviarAvaliacao(evento) {
 // Função para atualizar a média de avaliações de um jogo
 async function atualizarMediaJogo(jogoId) {
   try {
-    // Obter todas as avaliações do jogo
+    // Obtém todas as avaliações do jogo
     const avaliacoesSnapshot = await avaliacoesCollection
       .where('jogoId', '==', jogoId)
       .get();
 
-    if (avaliacoesSnapshot.empty) {
-      return;
-    }
+    if (avaliacoesSnapshot.empty) return;
 
-    // Calcular média por categoria e média geral
+    // Calcula média por categoria e média geral
     const categoriasSoma = {};
     const categoriasCount = {};
     let somaGeralTotal = 0;
     let avaliacoesCount = 0;
 
-    // Inicializar contadores
+    // Inicializa contadores
     categorias.forEach(categoria => {
       categoriasSoma[categoria] = 0;
       categoriasCount[categoria] = 0;
-    });    // Processar avaliações por categoria
+    });    
+    // Processa avaliações por categoria
     avaliacoesSnapshot.forEach(doc => {
       const avaliacao = doc.data();
 
-      // Processar avaliações por categoria
+      // Processa avaliações por categoria
       if (avaliacao.avaliacoes) {
         // Para cada categoria na avaliação
-        Object.keys(avaliacao.avaliacoes).forEach(categoriaOriginal => {
-          // Mapeia para a nova categoria se necessário
-          const categoriaMapeada = mapearCategoriaAntigaParaNova(categoriaOriginal);
-          
-          // Somente processar se for uma categoria válida (nas novas categorias)
-          if (categorias.includes(categoriaMapeada)) {
-            const valor = avaliacao.avaliacoes[categoriaOriginal];
-            categoriasSoma[categoriaMapeada] = (categoriasSoma[categoriaMapeada] || 0) + valor;
-            categoriasCount[categoriaMapeada] = (categoriasCount[categoriaMapeada] || 0) + 1;
+        Object.keys(avaliacao.avaliacoes).forEach(categoria => {
+          // Somente processa se for uma categoria válida 
+          if (categorias.includes(categoria)) {
+            const valor = avaliacao.avaliacoes[categoria];
+            categoriasSoma[categoria] = (categoriasSoma[categoria] || 0) + valor;
+            categoriasCount[categoria] = (categoriasCount[categoria] || 0) + 1;
           }
         });
       }
 
-      // Contar avaliações gerais
+      // Conta avaliações gerais
       if (avaliacao.mediaGeral) {
         somaGeralTotal += avaliacao.mediaGeral;
         avaliacoesCount++;
       }
     });
 
-    // Calcular médias
+    // Calcula médias
     const mediasCategoria = {};
     categorias.forEach(categoria => {
       mediasCategoria[categoria] = categoriasCount[categoria] > 0 ?
@@ -218,13 +210,12 @@ async function atualizarMediaJogo(jogoId) {
 
     const mediaGeral = avaliacoesCount > 0 ? somaGeralTotal / avaliacoesCount : 0;
 
-    // Atualizar jogo com novas médias
+    // Atualiza jogo com novas médias
     await jogosCollection.doc(jogoId).update({
       avaliacao: mediaGeral,
       avaliacoesPorCategoria: mediasCategoria,
       totalAvaliacoes: avaliacoesCount
     });
-
   } catch (error) {
     console.error("Erro ao atualizar média do jogo:", error);
   }
@@ -248,7 +239,7 @@ function resetarFormulario() {
   document.getElementById('game-select').value = '';
   document.getElementById('comment').value = '';
 
-  // Resetar todos os sliders para o valor padrão 5
+  // Reseta todos os sliders para o valor padrão 5
   categorias.forEach(categoria => {
     const slider = document.getElementById(`${categoria}-range`);
     const valorDisplay = document.getElementById(`${categoria}-value`);
@@ -257,33 +248,6 @@ function resetarFormulario() {
       valorDisplay.textContent = 5;
     }
   });
-}
-
-// Função para gerar representação numérica da nota
-function gerarNumeroNota(nota) {
-  // Converter para uma escala de 1-10 se vier da escala antiga de 1-5
-  const notaFormatada = nota <= 5 ? nota * 2 : nota;
-  return `<span class="rating-text">${notaFormatada.toFixed(1)}</span>`;
-}
-
-// Função para converter nota do antigo sistema (1-5) para o novo (1-10)
-function converterNota(notaAntiga) {
-  // Se a nota já estiver na escala de 1-10, retornar como está
-  if (notaAntiga > 5) return notaAntiga;
-  // Caso contrário, converter de 1-5 para 1-10
-  return notaAntiga * 2;
-}
-
-// Função para mapear categorias antigas para novas (para retrocompatibilidade)
-function mapearCategoriaAntigaParaNova(categoriaAntiga) {
-  const mapeamento = {
-    'gameplay': 'jogabilidade',
-    'visual': 'design',
-    'som': 'som', // mesmo nome, mantém
-    'originalidade': 'criatividade'
-  };
-  
-  return mapeamento[categoriaAntiga] || categoriaAntiga;
 }
 
 // Função para carregar o ranking dos jogos
@@ -295,20 +259,17 @@ async function carregarRanking(categoria = 'geral') {
     let snapshot;
 
     if (categoria === 'geral') {
-      // Ordenar por avaliação geral
+      // Ordena por avaliação geral
       snapshot = await jogosCollection
         .where('avaliacao', '>', 0)
         .orderBy('avaliacao', 'desc')
         .limit(10)
         .get();
     } else {
-      // Verificar se é categoria antiga
-      const categoriaMapeada = mapearCategoriaAntigaParaNova(categoria);
-      
-      // Ordenar pela categoria específica
+      // Ordena pela categoria específica
       snapshot = await jogosCollection
-        .where(`avaliacoesPorCategoria.${categoriaMapeada}`, '>', 0)
-        .orderBy(`avaliacoesPorCategoria.${categoriaMapeada}`, 'desc')
+        .where(`avaliacoesPorCategoria.${categoria}`, '>', 0)
+        .orderBy(`avaliacoesPorCategoria.${categoria}`, 'desc')
         .limit(10)
         .get();
     }
@@ -322,23 +283,11 @@ async function carregarRanking(categoria = 'geral') {
 
     let posicao = 1;
     snapshot.forEach(doc => {
-      const jogo = doc.data();      // Determinar a nota baseada na categoria
+      const jogo = doc.data();      
+      // Determina a nota baseada na categoria
       let nota;
-      if (categoria === 'geral') {
-        nota = jogo.avaliacao;
-      } else {
-        const categoriaMapeada = mapearCategoriaAntigaParaNova(categoria);
-        // Tentar obter da categoria mapeada primeiro
-        nota = jogo.avaliacoesPorCategoria?.[categoriaMapeada] || 0;
-        
-        // Se não encontrou na nova, tenta na categoria original (retrocompatibilidade)
-        if (nota === 0 && categoria !== categoriaMapeada) {
-          nota = jogo.avaliacoesPorCategoria?.[categoria] || 0;
-        }
-      }
-      
-      // Converter para escala 1-10 se for do sistema antigo
-      const notaConvertida = converterNota(nota);
+      if (categoria === 'geral') nota = jogo.avaliacao;
+      else nota = jogo.avaliacoesPorCategoria?.[categoria] || 0;
 
       const rankRow = document.createElement('div');
       rankRow.className = 'ranking-row';
@@ -346,22 +295,21 @@ async function carregarRanking(categoria = 'geral') {
       const rankClass = posicao <= 3 ? `rank-${posicao}` : '';
 
       rankRow.innerHTML = `
-                <div class="rank-column">
-                    <div class="rank-badge ${rankClass}">${posicao}</div>
-                </div>
-                <div class="game-column">${jogo.titulo}</div>
-                <div class="creator-column">${jogo.autor}</div>
-                <div class="rating-column">
-                    <div class="rating">
-                        <span class="rating-text">${notaConvertida.toFixed(1)}</span>
-                    </div>
-                </div>
-            `;
+        <div class="rank-column">
+          <div class="rank-badge ${rankClass}">${posicao}</div>
+        </div>
+        <div class="game-column">${jogo.titulo}</div>
+        <div class="creator-column">${jogo.autor}</div>
+        <div class="rating-column">
+          <div class="rating">
+            <span class="rating-text">${nota.toFixed(1)}</span>
+          </div>
+        </div>
+      `;
 
       rankingContent.appendChild(rankRow);
       posicao++;
     });
-
   } catch (error) {
     console.error("Erro ao carregar ranking:", error);
     const rankingContent = document.getElementById('ranking-content');
@@ -372,26 +320,22 @@ async function carregarRanking(categoria = 'geral') {
 // Função para atualizar o valor exibido quando o slider é movido
 function atualizarValorSlider(categoria, valor) {
   const valorDisplay = document.getElementById(`${categoria}-value`);
-  if (valorDisplay) {
-    valorDisplay.textContent = valor;
-  }
+  if (valorDisplay) valorDisplay.textContent = valor;
 }
 
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {
-  // Carregar jogos no select
+  // Carrega jogos no select
   carregarJogosSelect();
 
-  // Carregar ranking inicial
+  // Carrega ranking inicial
   carregarRanking();
 
-  // Configurar evento do botão de enviar avaliação
+  // Configura evento do botão de enviar avaliação
   const submitButton = document.getElementById('submit-rating');
-  if (submitButton) {
-    submitButton.addEventListener('click', enviarAvaliacao);
-  }
+  if (submitButton) submitButton.addEventListener('click', enviarAvaliacao);
 
-  // Configurar evento do filtro de ranking
+  // Configura evento do filtro de ranking
   const rankingCategory = document.getElementById('ranking-category');
   if (rankingCategory) {
     rankingCategory.addEventListener('change', (e) => {
@@ -399,7 +343,7 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Configurar eventos para sliders de avaliação
+  // Configura eventos para sliders de avaliação
   categorias.forEach(categoria => {
     const slider = document.getElementById(`${categoria}-range`);
     if (slider) {

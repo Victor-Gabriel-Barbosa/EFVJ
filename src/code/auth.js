@@ -26,7 +26,7 @@ let currentUser = null;
 
 // Função para fazer login com Google
 function loginWithGoogle() {
-  // Configurando o Google Auth para abrir em popup
+  // Configura o Google Auth para abrir em popup
   googleProvider.setCustomParameters({
     prompt: 'select_account'
   });
@@ -179,8 +179,6 @@ function loadUserReviews(userId) {
   // Verifica se o elemento userReviews existe antes de prosseguir
   if (!userReviews) return;
   
-  // Implementação para carregar avaliações do Firebase
-  // Esta é uma versão básica, você pode expandir conforme necessário
   const avaliacoesCollection = db.collection('avaliacoes');
   
   avaliacoesCollection.where('usuarioId', '==', userId)

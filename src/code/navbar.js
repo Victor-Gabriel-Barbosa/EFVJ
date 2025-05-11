@@ -1,7 +1,4 @@
-/**
- * Sistema de componentes para carregar elementos compartilhados entre páginas
- * Autor: Victor-Gabriel-Barbosa
- */
+// Componente de barra de navegação dinâmica
 
 /**
  * Cria uma navbar dinâmica e a insere no elemento alvo
@@ -67,9 +64,7 @@ function createNavbar(targetElementId, callback) {
 
     // Executa callback se fornecido
     if (callback && typeof callback === 'function') callback();
-  } else {
-    console.error(`Elemento com ID "${targetElementId}" não encontrado.`);
-  }
+  } else console.error(`Elemento com ID "${targetElementId}" não encontrado.`);
 }
 
 /**
@@ -106,9 +101,7 @@ function loadComponent(componentPath, targetElementId, callback) {
     });
 }
 
-/**
- * Marca o link da navbar que corresponde à página atual
- */
+// Marca o link da navbar que corresponde à página atual
 function markActiveNavLink() {
   const currentPage = window.location.pathname.split('/').pop() || 'index.html';
 

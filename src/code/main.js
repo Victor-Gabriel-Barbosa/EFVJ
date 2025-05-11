@@ -2,19 +2,17 @@
 
 // Inicialização ao carregar a página
 document.addEventListener('DOMContentLoaded', function () {
-  // Verificar em qual página estamos
+  // Verifica em qual página estamos
   const currentPath = window.location.pathname;
 
-  // Inicializar o Firebase se disponível
+  // Inicializa o Firebase se disponível
   inicializarFirebase();
 
-  // Atualizar o status do usuário na página
+  // Atualiza o status do usuário na página
   atualizarStatusUsuario();
 
-  // Inicializar a página de jogos
-  if (currentPath.includes('jogos.html')) {
-    inicializarPaginaJogos();
-  }
+  // Inicializa a página de jogos
+  if (currentPath.includes('jogos.html')) inicializarPaginaJogos();
 
   // Adiciona listeners comuns a todas as páginas
   adicionarListenersComuns();
@@ -22,11 +20,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
 // Inicializa o Firebase e configurações relacionadas
 function inicializarFirebase() {
-  // Verificar se o Firebase está disponível
+  // Verifica se o Firebase está disponível
   if (typeof firebase !== 'undefined' && firebase.apps.length) {
     console.log('Firebase inicializado com sucesso!');
 
-    // Configurar observadores de autenticação
+    // Configura observadores de autenticação
     if (typeof firebase.auth === 'function') {
       firebase.auth().onAuthStateChanged(function (user) {
         atualizarStatusUsuario(user);
