@@ -151,7 +151,7 @@ body {
 }
 
 .auth-buttons {
-  display: flex;
+  display:inline-block;
   gap: 10px;
 }
 
