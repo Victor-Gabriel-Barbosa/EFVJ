@@ -139,13 +139,10 @@ async function adicionarJogo(evento) {
 
   try {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Salvando...';
-
-    // Obtém valores do formulário
+    btnSubmit.textContent = 'Salvando...';    // Obtém valores do formulário
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value || currentUser.displayName;
     const categoria = formulario.categoria.value;
-    const avaliacao = parseFloat(formulario.avaliacao.value);
     const linkJogo = formulario.linkJogo.value;
 
     // Upload da thumbnail se fornecida
@@ -160,14 +157,13 @@ async function adicionarJogo(evento) {
       // Usar os metadados customizados para resolver problema de CORS
       await storageRef.put(file, metadataStorage);
       thumbnailUrl = await storageRef.getDownloadURL();
-    }
-
-    // Criar documento no Firestore com os dados do usuário
+    }    // Criar documento no Firestore com os dados do usuário
     await jogosCollection.add({
       titulo,
       autor,
       categoria,
-      avaliacao,
+      avaliacao: 0, // Valor inicial de avaliação (sem avaliações)
+      numeroAvaliacoes: 0, // Contador de avaliações
       linkJogo,
       thumbnailUrl,
       autorId: currentUser.uid,
@@ -211,12 +207,9 @@ async function abrirFormularioEdicao(jogoId) {
 
     // Preenche o formulário com os dados atuais
     const formulario = document.getElementById('form-jogo');
-    formulario.reset();
-
-    formulario.titulo.value = jogo.titulo;
+    formulario.reset();    formulario.titulo.value = jogo.titulo;
     formulario.autor.value = jogo.autor;
     formulario.categoria.value = jogo.categoria;
-    formulario.avaliacao.value = jogo.avaliacao;
     formulario.linkJogo.value = jogo.linkJogo;
 
     // Adiciona um campo oculto para o ID do jogo
@@ -267,13 +260,10 @@ async function atualizarJogo(evento, jogoId) {
 
   try {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Atualizando...';
-
-    // Obtém valores do formulário
+    btnSubmit.textContent = 'Atualizando...';    // Obtém valores do formulário
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value;
     const categoria = formulario.categoria.value;
-    const avaliacao = parseFloat(formulario.avaliacao.value);
     const linkJogo = formulario.linkJogo.value;
 
     // Dados a atualizar
@@ -281,7 +271,6 @@ async function atualizarJogo(evento, jogoId) {
       titulo,
       autor,
       categoria,
-      avaliacao,
       linkJogo,
       dataAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
     };
