@@ -1,7 +1,7 @@
 // Funções para manipulação de avaliações no Firestore
 
 // Categorias de avaliação disponíveis
-const categorias = ['gameplay', 'visual', 'som', 'originalidade'];
+const categorias = ['som', 'criatividade', 'jogabilidade', 'design', 'historia', 'bugs', 'interatividade'];
 
 // Função para carregar jogos no select
 async function carregarJogosSelect() {
@@ -71,14 +71,15 @@ async function enviarAvaliacao(evento) {
 
     if (avaliacaoExistente) mostrarResultado("Você já avaliou este jogo! Atualizamos sua avaliação.", false);
 
-    // Coleta avaliações por categoria
+  // Coleta avaliações por categoria
     const avaliacoes = {};
     let somaAvaliacoes = 0;
     let categoriasAvaliadas = 0;
 
     categorias.forEach(categoria => {
-      const rating = document.querySelector(`input[name="${categoria}-rating"]:checked`)?.value;
-      if (rating) {
+      const slider = document.getElementById(`${categoria}-range`);
+      if (slider) {
+        const rating = slider.value;
         avaliacoes[categoria] = parseInt(rating);
         somaAvaliacoes += parseInt(rating);
         categoriasAvaliadas++;
@@ -181,19 +182,25 @@ async function atualizarMediaJogo(jogoId) {
     categorias.forEach(categoria => {
       categoriasSoma[categoria] = 0;
       categoriasCount[categoria] = 0;
-    });
-
-    // Somar todas as avaliações
+    });    // Processar avaliações por categoria
     avaliacoesSnapshot.forEach(doc => {
       const avaliacao = doc.data();
 
       // Processar avaliações por categoria
-      categorias.forEach(categoria => {
-        if (avaliacao.avaliacoes && avaliacao.avaliacoes[categoria]) {
-          categoriasSoma[categoria] += avaliacao.avaliacoes[categoria];
-          categoriasCount[categoria]++;
-        }
-      });
+      if (avaliacao.avaliacoes) {
+        // Para cada categoria na avaliação
+        Object.keys(avaliacao.avaliacoes).forEach(categoriaOriginal => {
+          // Mapeia para a nova categoria se necessário
+          const categoriaMapeada = mapearCategoriaAntigaParaNova(categoriaOriginal);
+          
+          // Somente processar se for uma categoria válida (nas novas categorias)
+          if (categorias.includes(categoriaMapeada)) {
+            const valor = avaliacao.avaliacoes[categoriaOriginal];
+            categoriasSoma[categoriaMapeada] = (categoriasSoma[categoriaMapeada] || 0) + valor;
+            categoriasCount[categoriaMapeada] = (categoriasCount[categoriaMapeada] || 0) + 1;
+          }
+        });
+      }
 
       // Contar avaliações gerais
       if (avaliacao.mediaGeral) {
@@ -241,11 +248,42 @@ function resetarFormulario() {
   document.getElementById('game-select').value = '';
   document.getElementById('comment').value = '';
 
-  // Limpar todas as seleções de estrelas
+  // Resetar todos os sliders para o valor padrão 5
   categorias.forEach(categoria => {
-    const radios = document.querySelectorAll(`input[name="${categoria}-rating"]`);
-    radios.forEach(radio => radio.checked = false);
+    const slider = document.getElementById(`${categoria}-range`);
+    const valorDisplay = document.getElementById(`${categoria}-value`);
+    if (slider && valorDisplay) {
+      slider.value = 5;
+      valorDisplay.textContent = 5;
+    }
   });
+}
+
+// Função para gerar representação numérica da nota
+function gerarNumeroNota(nota) {
+  // Converter para uma escala de 1-10 se vier da escala antiga de 1-5
+  const notaFormatada = nota <= 5 ? nota * 2 : nota;
+  return `<span class="rating-text">${notaFormatada.toFixed(1)}</span>`;
+}
+
+// Função para converter nota do antigo sistema (1-5) para o novo (1-10)
+function converterNota(notaAntiga) {
+  // Se a nota já estiver na escala de 1-10, retornar como está
+  if (notaAntiga > 5) return notaAntiga;
+  // Caso contrário, converter de 1-5 para 1-10
+  return notaAntiga * 2;
+}
+
+// Função para mapear categorias antigas para novas (para retrocompatibilidade)
+function mapearCategoriaAntigaParaNova(categoriaAntiga) {
+  const mapeamento = {
+    'gameplay': 'jogabilidade',
+    'visual': 'design',
+    'som': 'som', // mesmo nome, mantém
+    'originalidade': 'criatividade'
+  };
+  
+  return mapeamento[categoriaAntiga] || categoriaAntiga;
 }
 
 // Função para carregar o ranking dos jogos
@@ -264,10 +302,13 @@ async function carregarRanking(categoria = 'geral') {
         .limit(10)
         .get();
     } else {
+      // Verificar se é categoria antiga
+      const categoriaMapeada = mapearCategoriaAntigaParaNova(categoria);
+      
       // Ordenar pela categoria específica
       snapshot = await jogosCollection
-        .where(`avaliacoesPorCategoria.${categoria}`, '>', 0)
-        .orderBy(`avaliacoesPorCategoria.${categoria}`, 'desc')
+        .where(`avaliacoesPorCategoria.${categoriaMapeada}`, '>', 0)
+        .orderBy(`avaliacoesPorCategoria.${categoriaMapeada}`, 'desc')
         .limit(10)
         .get();
     }
@@ -281,15 +322,23 @@ async function carregarRanking(categoria = 'geral') {
 
     let posicao = 1;
     snapshot.forEach(doc => {
-      const jogo = doc.data();
-
-      // Determinar a nota baseada na categoria
+      const jogo = doc.data();      // Determinar a nota baseada na categoria
       let nota;
       if (categoria === 'geral') {
         nota = jogo.avaliacao;
       } else {
-        nota = jogo.avaliacoesPorCategoria?.[categoria] || 0;
+        const categoriaMapeada = mapearCategoriaAntigaParaNova(categoria);
+        // Tentar obter da categoria mapeada primeiro
+        nota = jogo.avaliacoesPorCategoria?.[categoriaMapeada] || 0;
+        
+        // Se não encontrou na nova, tenta na categoria original (retrocompatibilidade)
+        if (nota === 0 && categoria !== categoriaMapeada) {
+          nota = jogo.avaliacoesPorCategoria?.[categoria] || 0;
+        }
       }
+      
+      // Converter para escala 1-10 se for do sistema antigo
+      const notaConvertida = converterNota(nota);
 
       const rankRow = document.createElement('div');
       rankRow.className = 'ranking-row';
@@ -304,8 +353,7 @@ async function carregarRanking(categoria = 'geral') {
                 <div class="creator-column">${jogo.autor}</div>
                 <div class="rating-column">
                     <div class="rating">
-                        ${gerarEstrelas(nota)}
-                        <span class="rating-text">${nota.toFixed(1)}</span>
+                        <span class="rating-text">${notaConvertida.toFixed(1)}</span>
                     </div>
                 </div>
             `;
@@ -318,6 +366,14 @@ async function carregarRanking(categoria = 'geral') {
     console.error("Erro ao carregar ranking:", error);
     const rankingContent = document.getElementById('ranking-content');
     rankingContent.innerHTML = '<div class="empty-message">Erro ao carregar ranking.</div>';
+  }
+}
+
+// Função para atualizar o valor exibido quando o slider é movido
+function atualizarValorSlider(categoria, valor) {
+  const valorDisplay = document.getElementById(`${categoria}-value`);
+  if (valorDisplay) {
+    valorDisplay.textContent = valor;
   }
 }
 
@@ -343,33 +399,14 @@ document.addEventListener('DOMContentLoaded', () => {
     });
   }
 
-  // Configurar eventos para seleção de estrelas
+  // Configurar eventos para sliders de avaliação
   categorias.forEach(categoria => {
-    const estrelas = document.querySelectorAll(`.star-rating[data-category="${categoria}"] label`);
-    estrelas.forEach((estrela, index) => {
-      estrela.addEventListener('mouseover', () => {
-        // Destacar estrelas ao passar o mouse
-        for (let i = 0; i <= index; i++) {
-          estrelas[i].style.filter = 'invert(71%) sepia(77%) saturate(2059%) hue-rotate(359deg) brightness(102%) contrast(105%)';
-        }
+    const slider = document.getElementById(`${categoria}-range`);
+    if (slider) {
+      slider.addEventListener('input', () => {
+        atualizarValorSlider(categoria, slider.value);
       });
-
-      estrela.addEventListener('mouseout', () => {
-        // Remover destaque ao tirar o mouse
-        estrelas.forEach(e => {
-          e.style.filter = '';
-        });
-
-        // Manter destaque nas estrelas selecionadas
-        const radioSelecionado = document.querySelector(`input[name="${categoria}-rating"]:checked`);
-        if (radioSelecionado) {
-          const valor = parseInt(radioSelecionado.value);
-          for (let i = 0; i < valor; i++) {
-            estrelas[i].style.filter = 'invert(71%) sepia(77%) saturate(2059%) hue-rotate(359deg) brightness(102%) contrast(105%)';
-          }
-        }
-      });
-    });
+    }
   });
 
   // Eventos de autenticação

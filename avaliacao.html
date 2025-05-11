@@ -46,73 +46,83 @@
               <option value="">-- Escolha um jogo --</option>
               <!-- Opções serão carregadas via JavaScript -->
             </select>
-          </div>
-
-          <!-- Avaliação por categoria -->
+          </div>          <!-- Avaliação por categoria -->
           <div class="categories-rating">
-            <h3 class="category-title">Avaliação por Categoria</h3>
-            
-            <div class="category-rating">
-              <label>Gameplay:</label>
-              <div class="star-rating" data-category="gameplay">
-                <input type="radio" id="gameplay-star5" name="gameplay-rating" value="5" />
-                <label for="gameplay-star5" class="pixel-star"></label>
-                <input type="radio" id="gameplay-star4" name="gameplay-rating" value="4" />
-                <label for="gameplay-star4" class="pixel-star"></label>
-                <input type="radio" id="gameplay-star3" name="gameplay-rating" value="3" />
-                <label for="gameplay-star3" class="pixel-star"></label>
-                <input type="radio" id="gameplay-star2" name="gameplay-rating" value="2" />
-                <label for="gameplay-star2" class="pixel-star"></label>
-                <input type="radio" id="gameplay-star1" name="gameplay-rating" value="1" />
-                <label for="gameplay-star1" class="pixel-star"></label>
+            <h3 class="category-title">Avaliação por Categoria</h3>            <div class="category-rating">
+              <label>Som (Áudio e trilha sonora):
+                <span class="tooltip">?
+                  <span class="tooltip-text">Avalia a qualidade dos efeitos sonoros e músicas, incluindo a trilha sonora e como ela se integra à experiência do jogo.</span>
+                </span>
+              </label>
+              <div class="number-rating" data-category="som">
+                <input type="range" id="som-range" name="som-rating" min="1" max="10" value="5" />
+                <span class="rating-value" id="som-value">5</span>
               </div>
             </div>
-            
             <div class="category-rating">
-              <label>Visual:</label>
-              <div class="star-rating" data-category="visual">
-                <input type="radio" id="visual-star5" name="visual-rating" value="5" />
-                <label for="visual-star5" class="pixel-star"></label>
-                <input type="radio" id="visual-star4" name="visual-rating" value="4" />
-                <label for="visual-star4" class="pixel-star"></label>
-                <input type="radio" id="visual-star3" name="visual-rating" value="3" />
-                <label for="visual-star3" class="pixel-star"></label>
-                <input type="radio" id="visual-star2" name="visual-rating" value="2" />
-                <label for="visual-star2" class="pixel-star"></label>
-                <input type="radio" id="visual-star1" name="visual-rating" value="1" />
-                <label for="visual-star1" class="pixel-star"></label>
+              <label>Criatividade e inovação:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Avalia quão original, criativo e inovador é o jogo em termos de mecânicas, conceitos e ideias.</span>
+                </span>
+              </label>
+              <div class="number-rating" data-category="criatividade">
+                <input type="range" id="criatividade-range" name="criatividade-rating" min="1" max="10" value="5" />
+                <span class="rating-value" id="criatividade-value">5</span>
               </div>
             </div>
-            
             <div class="category-rating">
-              <label>Som:</label>
-              <div class="star-rating" data-category="som">
-                <input type="radio" id="som-star5" name="som-rating" value="5" />
-                <label for="som-star5" class="pixel-star"></label>
-                <input type="radio" id="som-star4" name="som-rating" value="4" />
-                <label for="som-star4" class="pixel-star"></label>
-                <input type="radio" id="som-star3" name="som-rating" value="3" />
-                <label for="som-star3" class="pixel-star"></label>
-                <input type="radio" id="som-star2" name="som-rating" value="2" />
-                <label for="som-star2" class="pixel-star"></label>
-                <input type="radio" id="som-star1" name="som-rating" value="1" />
-                <label for="som-star1" class="pixel-star"></label>
+              <label>Jogabilidade e Mecânica:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Avalia a fluídez, responsividade e qualidade dos controles e mecânicas de jogo.</span>
+                </span>
+              </label>
+              <div class="number-rating" data-category="jogabilidade">
+                <input type="range" id="jogabilidade-range" name="jogabilidade-rating" min="1" max="10" value="5" />
+                <span class="rating-value" id="jogabilidade-value">5</span>
               </div>
             </div>
-            
             <div class="category-rating">
-              <label>Originalidade:</label>
-              <div class="star-rating" data-category="originalidade">
-                <input type="radio" id="originalidade-star5" name="originalidade-rating" value="5" />
-                <label for="originalidade-star5" class="pixel-star"></label>
-                <input type="radio" id="originalidade-star4" name="originalidade-rating" value="4" />
-                <label for="originalidade-star4" class="pixel-star"></label>
-                <input type="radio" id="originalidade-star3" name="originalidade-rating" value="3" />
-                <label for="originalidade-star3" class="pixel-star"></label>
-                <input type="radio" id="originalidade-star2" name="originalidade-rating" value="2" />
-                <label for="originalidade-star2" class="pixel-star"></label>
-                <input type="radio" id="originalidade-star1" name="originalidade-rating" value="1" />
-                <label for="originalidade-star1" class="pixel-star"></label>
+              <label>Design (de mundo e personagens):
+                <span class="tooltip">?
+                  <span class="tooltip-text">Avalia a qualidade visual, estética e design dos ambientes, personagens e elementos do jogo.</span>
+                </span>
+              </label>
+              <div class="number-rating" data-category="design">
+                <input type="range" id="design-range" name="design-rating" min="1" max="10" value="5" />
+                <span class="rating-value" id="design-value">5</span>
+              </div>
+            </div>
+            <div class="category-rating">
+              <label>História e Narrativa:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Avalia a qualidade do enredo, narrativa, diálogos e construção de mundo do jogo.</span>
+                </span>
+              </label>
+              <div class="number-rating" data-category="historia">
+                <input type="range" id="historia-range" name="historia-rating" min="1" max="10" value="5" />
+                <span class="rating-value" id="historia-value">5</span>
+              </div>
+            </div>
+            <div class="category-rating">
+              <label>Análise de Bugs:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Avalia a presença ou ausência de bugs, glitches e problemas técnicos no jogo.</span>
+                </span>
+              </label>
+              <div class="number-rating" data-category="bugs">
+                <input type="range" id="bugs-range" name="bugs-rating" min="1" max="10" value="5" />
+                <span class="rating-value" id="bugs-value">5</span>
+              </div>
+            </div>
+            <div class="category-rating">
+              <label>Interatividade com o mundo:
+                <span class="tooltip">?
+                  <span class="tooltip-text">Avalia o quanto o jogador pode interagir com o ambiente e como o mundo do jogo responde às ações do jogador.</span>
+                </span>
+              </label>
+              <div class="number-rating" data-category="interatividade">
+                <input type="range" id="interatividade-range" name="interatividade-rating" min="1" max="10" value="5" />
+                <span class="rating-value" id="interatividade-value">5</span>
               </div>
             </div>
           </div>
@@ -130,13 +140,15 @@
       <section class="pixel-box">
         <h2 class="pixel-subtitle">Ranking dos Jogos</h2>
         <div class="ranking-options">
-          <label for="ranking-category">Filtrar por categoria:</label>
-          <select id="ranking-category" class="pixel-select">
+          <label for="ranking-category">Filtrar por categoria:</label>          <select id="ranking-category" class="pixel-select">
             <option value="geral">Avaliação Geral</option>
-            <option value="gameplay">Gameplay</option>
-            <option value="visual">Visual</option>
-            <option value="som">Som</option>
-            <option value="originalidade">Originalidade</option>
+            <option value="som">Som (Áudio e trilha sonora)</option>
+            <option value="criatividade">Criatividade e inovação</option>
+            <option value="jogabilidade">Jogabilidade e Mecânica</option>
+            <option value="design">Design (de mundo e personagens)</option>
+            <option value="historia">História e Narrativa</option>
+            <option value="bugs">Análise de Bugs</option>
+            <option value="interatividade">Interatividade com o mundo</option>
           </select>
         </div>
         <div id="ranking-table" class="ranking-table">

@@ -1,0 +1,46 @@
+/* Estilos para avaliação numérica */
+.number-rating {
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.number-rating input[type="range"] {
+  flex: 1;
+  -webkit-appearance: none;
+  appearance: none;
+  width: 100%;
+  height: 10px;
+  background: rgba(255, 255, 255, 0.2);
+  border: 2px solid var(--primary);
+  border-radius: 0;
+  outline: none;
+  padding: 0;
+  margin: 0 10px 0 0;
+}
+
+.number-rating input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid var(--light);
+}
+
+.number-rating input[type="range"]::-moz-range-thumb {
+  width: 20px;
+  height: 20px;
+  background: var(--primary);
+  cursor: pointer;
+  border: 2px solid var(--light);
+}
+
+.rating-value {
+  font-family: 'Press Start 2P', cursive;
+  font-size: 1.2rem;
+  color: var(--primary);
+  min-width: 25px;
+  text-align: center;
+}
