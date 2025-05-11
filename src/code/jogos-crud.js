@@ -40,6 +40,9 @@ async function carregarJogos() {
     // Reaplica os filtros se necessário
     const filtroAtivo = document.querySelector('.filter-btn.active');
     if (filtroAtivo && filtroAtivo.dataset.filter !== 'all') filtrarJogos(filtroAtivo.dataset.filter);
+
+    // Atualiza contadores após carregar jogos
+    atualizarContadores();
   } catch (error) {
     console.error("Erro ao carregar jogos:", error);
   }
@@ -61,8 +64,8 @@ function criarElementoJogo(jogo, jogoId) {
   // Inclui os botões de editar/excluir apenas se for o dono do jogo
   const acoesBtns = isOwner ? `
     <div class="game-actions">
-      <button class="pixel-button edit-btn" onclick="abrirFormularioEdicao('${jogoId}')">Editar</button>
-      <button class="pixel-button delete-btn" onclick="confirmarExclusao('${jogoId}')">Excluir</button>
+      <button class="pixel-button edit-btn" onclick="abrirFormularioEdicao('${jogoId}')"><i class="fas fa-edit"></i> Editar</button>
+      <button class="pixel-button delete-btn" onclick="confirmarExclusao('${jogoId}')"><i class="fas fa-trash-alt"></i> Excluir</button>
     </div>
   ` : '';
 
@@ -82,19 +85,27 @@ function criarElementoJogo(jogo, jogoId) {
       </div>
     `;
   }
+  // Adiciona badge da categoria
+  const categoriaNome = jogo.categoria.charAt(0).toUpperCase() + jogo.categoria.slice(1);
+  const badgeCategoria = `<div class="category-badge ${jogo.categoria}">${categoriaNome}</div>`;
 
   divJogo.innerHTML = `
-    <div class="game-thumbnail" style="--bg-image: url('${thumbnailUrl}')"></div>
+    ${badgeCategoria}
+    <a href="${jogo.linkJogo}" target="_blank" class="thumbnail-link">
+      <div class="game-thumbnail" style="--bg-image: url('${thumbnailUrl}')"></div>
+    </a>
     <div class="game-info">
       <h3>${jogo.titulo}</h3>
-      <p>Por: ${jogo.autor}</p>
+      <p><i class="fas fa-user"></i> Por: ${jogo.autor}</p>
       <div class="rating">
-        ${gerarEstrelas(jogo.avaliacao)}
+        <div class="rating-stars">${gerarEstrelas(jogo.avaliacao)}</div>
         <span class="rating-text">${jogo.avaliacao.toFixed(1)}</span>
       </div>
       ${avaliacoesCategorias}
-      <a href="${jogo.linkJogo}" class="pixel-button play-btn" target="_blank">Jogar</a>
-      <a href="avaliacao.html?jogo=${jogoId}" class="pixel-button rate-btn">Avaliar</a>
+      <div class="game-buttons">
+        <a href="${jogo.linkJogo}" class="pixel-button play-btn" target="_blank"><i class="fas fa-gamepad"></i> Jogar</a>
+        <a href="avaliacao.html?jogo=${jogoId}" class="pixel-button rate-btn"><i class="fas fa-star"></i> Avaliar</a>
+      </div>
       ${acoesBtns}
     </div>
   `;
@@ -105,17 +116,165 @@ function criarElementoJogo(jogo, jogoId) {
 // Função para gerar as estrelas de avaliação
 function gerarEstrelas(avaliacao) {
   let estrelas = '';
-  for (let i = 1; i <= 5; i++) estrelas += `<span class="pixel-star ${i <= avaliacao ? 'filled' : ''}"></span>`;
+  const totalEstrelas = 5;
+  
+  for (let i = 1; i <= totalEstrelas; i++) {
+    if (i <= Math.floor(avaliacao)) {
+      // Estrela completa
+      estrelas += `<span class="pixel-star filled" title="${i} de 5"></span>`;
+    } else if (i - 0.5 <= avaliacao) {
+      // Meia estrela (para avaliações como 3.5, 4.5)
+      estrelas += `<span class="pixel-star half-filled" title="${i-0.5} de 5"></span>`;
+    } else {
+      // Estrela vazia
+      estrelas += `<span class="pixel-star" title="${i} de 5"></span>`;
+    }
+  }
+  
   return estrelas;
 }
 
 // Função para filtrar jogos por categoria
 function filtrarJogos(categoria) {
   const jogos = document.querySelectorAll('.game-card');
+  
+  // Atualiza a classe ativa nos botões de filtro
+  document.querySelectorAll('.filter-btn').forEach(btn => {
+    if (btn.dataset.filter === categoria) {
+      btn.classList.add('active');
+    } else {
+      btn.classList.remove('active');
+    }
+  });
 
+  // Filtra os jogos com animação
   jogos.forEach(jogo => {
-    if (categoria === 'all' || jogo.dataset.category === categoria) jogo.style.display = 'block';
-    else jogo.style.display = 'none';
+    if (categoria === 'all' || jogo.dataset.category === categoria) {
+      // Reset da animação
+      jogo.style.animation = 'none';
+      jogo.offsetHeight; // Forçar reflow
+      jogo.style.animation = null;
+      
+      // Exibe com animação
+      jogo.style.display = 'block';
+      jogo.style.opacity = '0';
+      jogo.style.transform = 'translateY(20px)';
+      
+      // Pequeno atraso para cada card, criando efeito cascata
+      setTimeout(() => {
+        jogo.style.transition = 'opacity 0.3s ease, transform 0.3s ease';
+        jogo.style.opacity = '1';
+        jogo.style.transform = 'translateY(0)';
+      }, 50 * Array.from(jogos).indexOf(jogo) % 10); // Limita atraso para evitar atrasos longos
+    } else {
+      // Esconde com animação
+      jogo.style.transition = 'opacity 0.2s ease, transform 0.2s ease';
+      jogo.style.opacity = '0';
+      jogo.style.transform = 'translateY(10px)';
+      
+      setTimeout(() => {
+        jogo.style.display = 'none';
+      }, 200);
+    }
+  });
+  
+  // Mensagem quando não há jogos na categoria
+  const jogosGrid = document.querySelector('.games-grid');
+  const jogosVisiveis = Array.from(jogos).filter(jogo => 
+    categoria === 'all' || jogo.dataset.category === categoria
+  );
+  
+  // Remove mensagem anterior se existir
+  const mensagemAnterior = document.querySelector('.empty-category-message');
+  if (mensagemAnterior) mensagemAnterior.remove();
+  
+  // Adiciona mensagem se não houver jogos na categoria selecionada
+  if (jogosVisiveis.length === 0) {
+    const mensagem = document.createElement('p');
+    mensagem.className = 'empty-category-message';
+    mensagem.innerHTML = `<i class="fas fa-info-circle"></i> Nenhum jogo na categoria "${categoria}" encontrado. <br>Que tal ser o primeiro a submeter um?`;
+    jogosGrid.appendChild(mensagem);
+  }
+}
+
+// Melhoria de responsividade para o game-stats
+function ajustarTextoContadorResponsivo() {
+  const counterText = document.querySelector('.counter-text');
+  if (!counterText) return;
+  
+  // Ajusta o texto dependendo do tamanho da tela
+  if (window.innerWidth <= 360) {
+    const filteredCount = document.querySelector('.filtered-count').textContent;
+    const totalCount = document.querySelector('.total-count').textContent;
+    
+    if (filteredCount === totalCount) {
+      counterText.innerHTML = `<span class="total-count">${totalCount}</span> jogos`;
+    } else {
+      counterText.innerHTML = `<span class="filtered-count">${filteredCount}</span>/<span class="total-count">${totalCount}</span> jogos`;
+    }
+  } else {
+    const filteredCount = document.querySelector('.filtered-count').textContent;
+    const totalCount = document.querySelector('.total-count').textContent;
+    counterText.innerHTML = `Exibindo <span class="filtered-count">${filteredCount}</span> de <span class="total-count">${totalCount}</span> jogos`;
+  }
+}
+
+// Versão melhorada da função de atualizar contadores
+function atualizarContadores() {
+  const totalJogos = document.querySelectorAll('.game-card').length;
+  const jogosFiltrados = document.querySelectorAll('.game-card[style="display: block;"], .game-card:not([style*="display"])').length;
+  
+  document.querySelector('.total-count').textContent = totalJogos;
+  document.querySelector('.filtered-count').textContent = jogosFiltrados;
+  
+  // Aplica responsividade ao texto do contador
+  ajustarTextoContadorResponsivo();
+}
+
+// Adiciona evento de redimensionamento para ajustar o texto
+window.addEventListener('resize', ajustarTextoContadorResponsivo);
+
+// Função para ordenar jogos
+function ordenarJogos(criterio) {
+  const jogosGrid = document.querySelector('.games-grid');
+  const jogos = Array.from(document.querySelectorAll('.game-card'));
+  
+  // Ordena os jogos com base no critério selecionado
+  jogos.sort((a, b) => {
+    switch(criterio) {
+      case 'recentes':
+        // Ordena pela data de criação, assumindo que o ID tenha timestamp ou ordem de criação
+        return b.dataset.id.localeCompare(a.dataset.id);
+      
+      case 'populares':
+        // Para uma ordenação real baseada em popularidade, você precisaria 
+        // adicionar um atributo de contagem de visualizações ao carregar os jogos
+        // Aqui simulamos um contador básico baseado no ID como exemplo
+        return parseInt(b.dataset.id.slice(-5), 16) - parseInt(a.dataset.id.slice(-5), 16);
+      
+      case 'avaliacao':
+        // Ordena pela avaliação (nota)
+        const avaliacaoA = parseFloat(a.querySelector('.rating-text').textContent);
+        const avaliacaoB = parseFloat(b.querySelector('.rating-text').textContent);
+        return avaliacaoB - avaliacaoA;
+      
+      case 'titulo':
+        // Ordena pelo título alfabeticamente
+        return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent);
+      
+      default:
+        return 0;
+    }
+  });
+  
+  // Reordena os elementos no DOM
+  jogos.forEach(jogo => jogosGrid.appendChild(jogo));
+  
+  // Aplicar animações sutis após a ordenação
+  jogos.forEach((jogo, index) => {
+    jogo.style.animation = 'none';
+    jogo.offsetHeight; // Forçar reflow
+    jogo.style.animation = `fadeIn 0.3s ease-out ${index * 0.05}s forwards`;
   });
 }
 
@@ -408,13 +567,15 @@ function salvarJogo(evento) {
 }
 
 // Inicialização
-document.addEventListener('DOMContentLoaded', () => {
-  // Verifica se está na página de jogos antes de inicializar funcionalidades específicas
+document.addEventListener('DOMContentLoaded', () => {  // Verifica se está na página de jogos antes de inicializar funcionalidades específicas
   const isJogosPage = window.location.pathname.includes('jogos.html');
   
   // Carrega jogos apenas se estiver na página de jogos
   if (isJogosPage) {
     carregarJogos();
+    
+    // Inicializa o texto responsivo dos contadores
+    ajustarTextoContadorResponsivo();
     
     // Configura listeners para filtros
     document.querySelectorAll('.filter-btn').forEach(btn => {
@@ -492,4 +653,32 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log('Usuário não logado, botão oculto na inicialização');
     }
   }
+
+  // Configurar select de ordenação
+  const sortSelect = document.getElementById('sort-games');
+  if (sortSelect) {
+    sortSelect.addEventListener('change', function() {
+      ordenarJogos(this.value);
+    });
+  }
+  
+  // Setup de filtros com atualização de contadores
+  const botoesFiltragem = document.querySelectorAll('.filter-btn');
+  botoesFiltragem.forEach(botao => {
+    botao.addEventListener('click', function() {
+      const filtro = this.dataset.filter;
+      
+      // Remove classe ativa de todos os botões
+      botoesFiltragem.forEach(b => b.classList.remove('active'));
+      
+      // Adiciona classe ativa ao botão clicado
+      this.classList.add('active');
+      
+      // Filtra os jogos
+      filtrarJogos(filtro);
+      
+      // Atualiza contadores após a filtragem
+      setTimeout(atualizarContadores, 300); // Dá tempo para as animações terminarem
+    });
+  });
 });

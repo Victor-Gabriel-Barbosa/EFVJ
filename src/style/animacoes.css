@@ -1,0 +1,97 @@
+/* Animações para os cards de jogos */
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.03); }
+  100% { transform: scale(1); }
+}
+
+@keyframes glow {
+  0% { box-shadow: 0 0 5px rgba(61, 216, 120, 0.5); }
+  50% { box-shadow: 0 0 15px rgba(61, 216, 120, 0.8); }
+  100% { box-shadow: 0 0 5px rgba(61, 216, 120, 0.5); }
+}
+
+@keyframes slideIn {
+  from { transform: translateX(-20px); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
+
+/* Aplicando animações aos elementos */
+.game-card {
+  animation: fadeIn 0.5s ease-out forwards;
+  animation-fill-mode: both;
+}
+
+/* Animar cards em sequência */
+.games-grid .game-card:nth-child(1) { animation-delay: 0.1s; }
+.games-grid .game-card:nth-child(2) { animation-delay: 0.2s; }
+.games-grid .game-card:nth-child(3) { animation-delay: 0.3s; }
+.games-grid .game-card:nth-child(4) { animation-delay: 0.4s; }
+.games-grid .game-card:nth-child(5) { animation-delay: 0.5s; }
+.games-grid .game-card:nth-child(6) { animation-delay: 0.6s; }
+.games-grid .game-card:nth-child(7) { animation-delay: 0.7s; }
+.games-grid .game-card:nth-child(8) { animation-delay: 0.8s; }
+.games-grid .game-card:nth-child(9) { animation-delay: 0.9s; }
+/* Restante dos cards sem atraso para não demorar demais em grids grandes */
+
+/* Efeito hover mais elaborado */
+.game-card:hover .play-btn {
+  animation: pulse 1s infinite ease-in-out;
+}
+
+/* Efeitos específicos para categorias */
+.game-card[data-category="aventura"] .category-badge {
+  animation: glow 2s infinite;
+}
+
+.game-card[data-category="acao"] .game-thumbnail::after {
+  background: linear-gradient(to top, rgba(244, 67, 54, 0.6), transparent);
+}
+
+.game-card[data-category="puzzle"] .game-thumbnail::after {
+  background: linear-gradient(to top, rgba(33, 150, 243, 0.6), transparent);
+}
+
+.game-card[data-category="rpg"] .game-thumbnail::after {
+  background: linear-gradient(to top, rgba(156, 39, 176, 0.6), transparent);
+}
+
+.game-card[data-category="estrategia"] .game-thumbnail::after {
+  background: linear-gradient(to top, rgba(0, 188, 212, 0.6), transparent);
+}
+
+/* Animação para filtros */
+.filter-btn {
+  transition: all 0.3s ease;
+}
+
+.filter-btn.active {
+  animation: pulse 2s infinite ease-in-out;
+}
+
+/* Melhoria para dispositivos que suportam hover */
+@media (hover: hover) {
+  .game-card:hover {
+    transform: translateY(-8px) scale(1.02);
+  }
+  
+  .category-score:hover {
+    transform: translateY(-2px);
+  }
+}
+
+/* Desabilitar algumas animações em dispositivos móveis para melhor performance */
+@media (max-width: 768px) {
+  .game-card {
+    animation: fadeIn 0.3s ease-out forwards;
+  }
+  
+  .games-grid .game-card:nth-child(n+4) {
+    animation-delay: 0.3s;
+  }
+}

@@ -1,0 +1,77 @@
+/* Estilos avançados para os filtros de jogos */
+.games-filter {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin: 25px 0;
+  justify-content: center;
+  padding: 15px;
+  background-color: rgba(0, 0, 0, 0.2);
+  border-radius: 4px;
+}
+
+.filter-btn {
+  font-size: 0.7rem;
+  position: relative;
+  transition: all 0.3s ease;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 90px;
+}
+
+.filter-btn::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0%;
+  height: 3px;
+  background-color: var(--primary);
+  transition: width 0.3s ease;
+}
+
+.filter-btn:hover::after {
+  width: 100%;
+}
+
+.filter-btn.active {
+  background-color: var(--primary);
+  box-shadow: 0 0 8px var(--primary);
+  transform: scale(1.05);
+}
+
+.filter-btn i {
+  margin-right: 5px;
+  font-size: 0.9rem;
+}
+
+/* Categoria específica para botões de filtro */
+.filter-btn[data-filter="all"] i { color: #fff; }
+.filter-btn[data-filter="plataforma"] i { color: #ffc107; }
+.filter-btn[data-filter="aventura"] i { color: #4CAF50; }
+.filter-btn[data-filter="puzzle"] i { color: #2196F3; }
+.filter-btn[data-filter="rpg"] i { color: #9c27b0; }
+.filter-btn[data-filter="acao"] i { color: #f44336; }
+.filter-btn[data-filter="estrategia"] i { color: #00bcd4; }
+
+/* Responsividade para filtros */
+@media (max-width: 480px) {
+  .games-filter {
+    justify-content: flex-start;
+    overflow-x: auto;
+    padding: 15px 10px;
+    flex-wrap: nowrap;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none; /* Firefox */
+  }
+  
+  .games-filter::-webkit-scrollbar {
+    display: none; /* Chrome, Safari, Opera*/
+  }
+  
+  .filter-btn {
+    flex: 0 0 auto;
+  }
+}
