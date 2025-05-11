@@ -151,19 +151,22 @@
             <option value="bugs">Análise de Bugs</option>
             <option value="interatividade">Interatividade com o mundo</option>
           </select>
-        </div>
-        <div id="ranking-table" class="ranking-table">
-          <div class="ranking-header">
-            <div class="rank-column">Posição</div>
-            <div class="game-column">Jogo</div>
-            <div class="creator-column">Criador</div>
-            <div class="rating-column">Nota</div>
-          </div>
-          <div id="ranking-content">
+        </div>        <table id="ranking-table" class="ranking-table">
+          <thead>
+            <tr class="ranking-header">
+              <th class="rank-column">Posição</th>
+              <th class="game-column">Jogo</th>
+              <th class="creator-column">Criador</th>
+              <th class="rating-column">Nota</th>
+            </tr>
+          </thead>
+          <tbody id="ranking-content">
             <!-- Conteúdo do ranking será preenchido via JavaScript -->
-            <div class="loading-message">Carregando ranking...</div>
-          </div>
-        </div>
+            <tr>
+              <td colspan="4" class="loading-message">Carregando ranking...</td>
+            </tr>
+          </tbody>
+        </table>
       </section>
     </main>
 

@@ -792,15 +792,35 @@ body {
 .ranking-table {
   width: 100%;
   border-collapse: collapse;
+  table-layout: fixed; /* Larguras fixas para melhor controle */
 }
 
-.ranking-header,
-.ranking-row {
-  display: grid;
-  grid-template-columns: 80px 2fr 1fr 1fr;
-  align-items: center;
-  padding: 10px 0;
-  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+.ranking-table th, .ranking-table td {
+  padding: 10px;
+  text-align: left;
+  vertical-align: middle;
+}
+
+.ranking-table th.rank-column, 
+.ranking-table td.rank-column {
+  width: 80px;
+  text-align: center;
+}
+
+.ranking-table th.game-column, 
+.ranking-table td.game-column {
+  width: 40%;
+}
+
+.ranking-table th.creator-column, 
+.ranking-table td.creator-column {
+  width: 30%;
+}
+
+.ranking-table th.rating-column, 
+.ranking-table td.rating-column {
+  width: 80px;
+  text-align: center;
 }
 
 .ranking-header {
@@ -808,6 +828,15 @@ body {
   font-size: 0.9rem;
   color: var(--accent);
   border-bottom: 3px solid var(--accent);
+}
+
+.ranking-row, .ranking-table tbody tr {
+  border-bottom: 2px solid rgba(255, 255, 255, 0.2);
+  transition: background-color 0.2s ease;
+}
+
+.ranking-row:hover, .ranking-table tbody tr:hover {
+  background-color: rgba(255, 255, 255, 0.05);
 }
 
 .rank-badge {
@@ -1088,17 +1117,28 @@ body {
   }
 
   .feature {
-    max-width: 100%;
-  }
+  max-width: 100%;  }
 
-  .ranking-header,
-  .ranking-row {
-    grid-template-columns: 60px 1fr 1fr 80px;
+  .ranking-table th,
+  .ranking-table td {
+    padding: 8px 5px;
     font-size: 0.8rem;
   }
+  
+  .ranking-table th.rank-column,
+  .ranking-table td.rank-column {
+    width: 60px;
+  }
+  
+  .ranking-table th.game-column,
+  .ranking-table td.game-column {
+    width: 45%;
+  }
 
-  .stars {
-    display: none;
+  .rank-badge {
+    width: 35px;
+    height: 35px;
+    font-size: 1rem;
   }
 
   .pixel-title {
@@ -1123,17 +1163,34 @@ body {
   .nav-brand {
     font-size: 1rem;
   }
-  
   .nav-username {
     max-width: 80px;
   }
 
-  .ranking-header,
-  .ranking-row {
-    grid-template-columns: 40px 3fr 2fr;
+  .ranking-table {
+    font-size: 0.7rem;
   }
-
-  .creator-column {
+  
+  .ranking-table th.rank-column,
+  .ranking-table td.rank-column {
+    width: 40px;
+    padding: 5px 2px;
+  }
+  
+  .ranking-table th.game-column,
+  .ranking-table td.game-column {
+    width: 60%;
+    padding-left: 5px;
+  }
+  
+  .ranking-table th.rating-column,
+  .ranking-table td.rating-column {
+    width: 40px;
+    padding: 5px 2px;
+  }
+  
+  .ranking-table th.creator-column,
+  .ranking-table td.creator-column {
     display: none;
   }
 

@@ -254,7 +254,7 @@ function resetarFormulario() {
 async function carregarRanking(categoria = 'geral') {
   try {
     const rankingContent = document.getElementById('ranking-content');
-    rankingContent.innerHTML = '<div class="loading-message">Carregando ranking...</div>';
+    rankingContent.innerHTML = '<tr><td colspan="4" class="loading-message">Carregando ranking...</td></tr>';
 
     let snapshot;
 
@@ -275,7 +275,7 @@ async function carregarRanking(categoria = 'geral') {
     }
 
     if (snapshot.empty) {
-      rankingContent.innerHTML = '<div class="empty-message">Nenhum jogo avaliado ainda.</div>';
+      rankingContent.innerHTML = '<tr><td colspan="4" class="empty-message">Nenhum jogo avaliado ainda.</td></tr>';
       return;
     }
 
@@ -289,22 +289,22 @@ async function carregarRanking(categoria = 'geral') {
       if (categoria === 'geral') nota = jogo.avaliacao;
       else nota = jogo.avaliacoesPorCategoria?.[categoria] || 0;
 
-      const rankRow = document.createElement('div');
+      const rankRow = document.createElement('tr');
       rankRow.className = 'ranking-row';
 
       const rankClass = posicao <= 3 ? `rank-${posicao}` : '';
 
       rankRow.innerHTML = `
-        <div class="rank-column">
+        <td class="rank-column">
           <div class="rank-badge ${rankClass}">${posicao}</div>
-        </div>
-        <div class="game-column">${jogo.titulo}</div>
-        <div class="creator-column">${jogo.autor}</div>
-        <div class="rating-column">
+        </td>
+        <td class="game-column">${jogo.titulo}</td>
+        <td class="creator-column">${jogo.autor}</td>
+        <td class="rating-column">
           <div class="rating">
             <span class="rating-text">${nota.toFixed(1)}</span>
           </div>
-        </div>
+        </td>
       `;
 
       rankingContent.appendChild(rankRow);
@@ -313,7 +313,7 @@ async function carregarRanking(categoria = 'geral') {
   } catch (error) {
     console.error("Erro ao carregar ranking:", error);
     const rankingContent = document.getElementById('ranking-content');
-    rankingContent.innerHTML = '<div class="empty-message">Erro ao carregar ranking.</div>';
+    rankingContent.innerHTML = '<tr><td colspan="4" class="empty-message">Erro ao carregar ranking.</td></tr>';
   }
 }
 
