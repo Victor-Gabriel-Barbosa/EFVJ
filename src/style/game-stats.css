@@ -17,7 +17,7 @@
   z-index: 10;
   backdrop-filter: blur(3px);
   -webkit-backdrop-filter: blur(3px);
-  transition: padding 0.3s ease, box-shadow 0.3s ease;
+  transition: all 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 .games-counter {
@@ -76,17 +76,28 @@
   cursor: pointer;
   border-radius: 2px;
   min-width: 120px;
-  transition: border-color 0.2s ease, box-shadow 0.2s ease;
+  transition: all 0.2s ease;
+  appearance: none;
+  -webkit-appearance: none;
+  -moz-appearance: none;
+  background-image: url("data:image/svg+xml;utf8,<svg fill='white' height='24' viewBox='0 0 24 24' width='24' xmlns='http://www.w3.org/2000/svg'><path d='M7 10l5 5 5-5z'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 5px center;
+  background-size: 16px;
+  padding-right: 22px;
 }
 
 .sort-select:focus {
   border-color: var(--primary);
   outline: none;
   box-shadow: 0 0 0 2px rgba(255, 120, 0, 0.3);
+  transform: scale(1.02);
 }
 
 .sort-select:hover {
   border-color: var(--accent);
+  transform: translateY(-1px);
+  box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2);
 }
 
 /* Responsividade para diferentes tamanhos de tela */
@@ -169,11 +180,41 @@
   }
 }
 
+/* Suporte para telas extremamente pequenas */
+@media (max-width: 320px) {
+  .games-stats {
+    padding: 8px;
+  }
+  
+  .games-counter {
+    font-size: 0.58rem;
+  }
+  
+  .counter-text {
+    letter-spacing: -0.5px;
+  }
+  
+  .sort-label {
+    font-size: 0.58rem;
+  }
+  
+  .sort-select {
+    font-size: 0.52rem;
+    padding: 5px;
+  }
+}
+
 /* Melhorias para dispositivos com tela sensível ao toque */
 @media (hover: none) {
   .sort-select {
-    padding: 8px;
+    padding: 10px 8px;
     margin: 2px 0;
+    min-height: 40px; /* Melhora a área de toque */
+  }
+  
+  .games-stats {
+    /* Aumenta o padding para facilitar o toque */
+    padding: 15px;
   }
 }
 
@@ -182,6 +223,68 @@
   padding: 8px 12px;
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
   background-color: rgba(26, 18, 38, 0.9);
+  transform: translateY(-2px);
+  border-color: rgba(255, 120, 0, 0.3);
+}
+
+/* Botão de voltar ao topo para dispositivos móveis */
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary);
+  border: 2px solid var(--light);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  animation: pulse-button 2s infinite;
+}
+
+@keyframes pulse-button {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 120, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 120, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 120, 0, 0);
+  }
+}
+
+.back-to-top i {
+  color: var(--dark);
+  font-size: 1.2rem;
+}
+
+/* Aumentar tamanho do botão em dispositivos muito pequenos para melhor área de toque */
+@media (max-width: 360px) {
+  .back-to-top {
+    width: 45px;
+    height: 45px;
+    right: 15px;
+    bottom: 15px;
+  }
+  
+  .back-to-top i {
+    font-size: 1.3rem;
+  }
 }
 
 /* Opções responsivas para modo escuro/modo claro */
@@ -193,10 +296,75 @@
   .games-stats-scrolled {
     background-color: rgba(26, 18, 38, 0.95);
   }
+  
+  .games-stats-active {
+    border-color: rgba(255, 255, 255, 0.25);
+  }
 }
 
 @media (prefers-color-scheme: light) {
   .games-stats {
     background-color: rgba(26, 18, 38, 0.7);
+  }
+  
+  .games-stats-active {
+    border-color: var(--primary);
+  }
+}
+
+/* Suporte para usuários que preferem alto contraste */
+@media (prefers-contrast: high) {
+  .games-stats {
+    background-color: #000;
+    border: 2px solid #fff;
+    box-shadow: none;
+  }
+  
+  .games-stats-scrolled {
+    background-color: #000;
+    border-color: #ff7800;
+  }
+  
+  .sort-select {
+    border: 2px solid #fff;
+    background-color: #000;
+  }
+  
+  .counter-text, .sort-label {
+    color: #fff;
+  }
+  
+  .back-to-top {
+    background-color: #fff;
+    border: 3px solid #000;
+  }
+  
+  .back-to-top i {
+    color: #000;
+  }
+}
+
+/* Classe de destaque quando os jogos estão visíveis */
+.games-stats-active {
+  border-width: 2px;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+}
+
+/* Suporte para orientação de tela */
+@media (orientation: landscape) and (max-height: 500px) {
+  .games-stats {
+    padding: 6px 15px;
+    flex-direction: row;
+    align-items: center;
+  }
+  
+  .games-counter, .games-sort {
+    margin: 0;
+    padding: 0;
+    border: none;
+  }
+  
+  .games-stats-scrolled {
+    padding: 4px 12px;
   }
 }

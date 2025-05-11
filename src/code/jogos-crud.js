@@ -202,21 +202,42 @@ function ajustarTextoContadorResponsivo() {
   const counterText = document.querySelector('.counter-text');
   if (!counterText) return;
   
-  // Ajusta o texto dependendo do tamanho da tela
-  if (window.innerWidth <= 360) {
-    const filteredCount = document.querySelector('.filtered-count').textContent;
-    const totalCount = document.querySelector('.total-count').textContent;
-    
+  const filteredCount = document.querySelector('.filtered-count').textContent;
+  const totalCount = document.querySelector('.total-count').textContent;
+  
+  // Verifica o tamanho da tela e ajusta o texto conforme necessário
+  if (window.innerWidth <= 320) {
+    // Telas muito pequenas - formato extremamente compacto
+    if (filteredCount === totalCount) {
+      counterText.innerHTML = `<span class="total-count">${totalCount}</span>j`;
+    } else {
+      counterText.innerHTML = `<span class="filtered-count">${filteredCount}</span>/<span class="total-count">${totalCount}</span>j`;
+    }
+  } else if (window.innerWidth <= 360) {
+    // Telas pequenas - formato compacto
     if (filteredCount === totalCount) {
       counterText.innerHTML = `<span class="total-count">${totalCount}</span> jogos`;
     } else {
       counterText.innerHTML = `<span class="filtered-count">${filteredCount}</span>/<span class="total-count">${totalCount}</span> jogos`;
     }
+  } else if (window.innerWidth <= 480) {
+    // Telas médias - formato semicompacto
+    if (filteredCount === totalCount) {
+      counterText.innerHTML = `<span class="total-count">${totalCount}</span> jogos`;
+    } else {
+      counterText.innerHTML = `<span class="filtered-count">${filteredCount}</span> de <span class="total-count">${totalCount}</span>`;
+    }
   } else {
-    const filteredCount = document.querySelector('.filtered-count').textContent;
-    const totalCount = document.querySelector('.total-count').textContent;
-    counterText.innerHTML = `Exibindo <span class="filtered-count">${filteredCount}</span> de <span class="total-count">${totalCount}</span> jogos`;
+    // Telas maiores - formato completo
+    if (filteredCount === totalCount) {
+      counterText.innerHTML = `<span class="total-count">${totalCount}</span> jogos disponíveis`;
+    } else {
+      counterText.innerHTML = `Exibindo <span class="filtered-count">${filteredCount}</span> de <span class="total-count">${totalCount}</span> jogos`;
+    }
   }
+  
+  // Adiciona atributo aria-label para acessibilidade
+  counterText.setAttribute('aria-label', `Exibindo ${filteredCount} de ${totalCount} jogos`);
 }
 
 // Versão melhorada da função de atualizar contadores

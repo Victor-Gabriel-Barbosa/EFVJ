@@ -1,24 +1,28 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 
-<head>  <meta charset="UTF-8">
+<head>
+  <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Jogos | Eu Faço Você Joga</title>
   <link rel="stylesheet" href="src/style/styles.css">
-  <link rel="stylesheet" href="src/style/card-responsivo.css">  <link rel="stylesheet" href="src/style/grid-responsiva.css">
-  <link rel="stylesheet" href="src/style/filtros.css">
-  <link rel="stylesheet" href="src/style/animacoes.css">
+  <link rel="stylesheet" href="src/style/card-responsivo.css">
+  <link rel="stylesheet" href="src/style/grid-responsiva.css">
+  <link rel="stylesheet" href="src/style/filtros.css">  <link rel="stylesheet" href="src/style/animacoes.css">  
   <link rel="stylesheet" href="src/style/game-stats.css">
+  <link rel="stylesheet" href="src/style/scroll-indicator.css">
+  <link rel="stylesheet" href="src/style/back-to-top.css">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <!-- Adiciona o script da barra de navegação -->
-  <script src="src/code/navbar.js"></script>
+  <!-- Adiciona o script da barra de navegação -->  <script src="src/code/navbar.js"></script>
+  <!-- Adiciona script para efeitos de rolagem nas estatísticas -->
+  <script src="src/code/stats-scroll.js"></script>
   <!-- Adiciona a logo da aplicação -->
   <link rel="icon" href="src/images/favicon/favicon.ico" type="image/x-icon">
 </head>
@@ -36,19 +40,25 @@
 
     <main class="game-main">
       <section class="pixel-box">
-        <h2 class="pixel-subtitle">Galeria de Jogos</h2>        <p>Confira os jogos criados pelos participantes! Clique em um jogo para ver mais detalhes e jogar.</p>
+        <h2 class="pixel-subtitle">Galeria de Jogos</h2>
+        <p>Confira os jogos criados pelos participantes! Clique em um jogo para ver mais detalhes e jogar.</p>
 
         <div class="games-filter">
-          <button class="pixel-button filter-btn active" data-filter="all"><i class="fas fa-th-large"></i> Todos</button>
-          <button class="pixel-button filter-btn" data-filter="plataforma"><i class="fas fa-running"></i> Plataforma</button>
-          <button class="pixel-button filter-btn" data-filter="aventura"><i class="fas fa-mountain"></i> Aventura</button>
-          <button class="pixel-button filter-btn" data-filter="puzzle"><i class="fas fa-puzzle-piece"></i> Puzzle</button>
+          <button class="pixel-button filter-btn active" data-filter="all"><i class="fas fa-th-large"></i>
+            Todos</button>
+          <button class="pixel-button filter-btn" data-filter="plataforma"><i class="fas fa-running"></i>
+            Plataforma</button>
+          <button class="pixel-button filter-btn" data-filter="aventura"><i class="fas fa-mountain"></i>
+            Aventura</button>
+          <button class="pixel-button filter-btn" data-filter="puzzle"><i class="fas fa-puzzle-piece"></i>
+            Puzzle</button>
           <button class="pixel-button filter-btn" data-filter="rpg"><i class="fas fa-dragon"></i> RPG</button>
-          <button class="pixel-button filter-btn" data-filter="acao"><i class="fas fa-bolt"></i> Ação</button>          <button class="pixel-button filter-btn" data-filter="estrategia"><i class="fas fa-chess"></i> Estratégia</button>
+          <button class="pixel-button filter-btn" data-filter="acao"><i class="fas fa-bolt"></i> Ação</button> <button
+            class="pixel-button filter-btn" data-filter="estrategia"><i class="fas fa-chess"></i> Estratégia</button>
         </div>
-          <div class="games-stats">
+        <div class="games-stats">
           <div class="games-counter">
-            <i class="fas fa-gamepad"></i> 
+            <i class="fas fa-gamepad"></i>
             <span class="counter-text">Exibindo <span class="filtered-count">0</span> de <span class="total-count">0</span> jogos</span>
           </div>
           <div class="games-sort">
@@ -60,17 +70,18 @@
               <option value="titulo">Título (A-Z)</option>
             </select>
           </div>
-        </div>
-        
-        <div class="games-grid">
+        </div>        <div class="games-grid">
           <!-- Jogos serão adicionados aqui via JavaScript -->
-        </div> 
+        </div>
 
-        <div class="add-game-section">
+        <!-- Indicador de rolagem -->
+        <div class="scroll-indicator">
+          <i class="fas fa-chevron-down scroll-indicator-icon"></i>
+          <span class="scroll-indicator-text">ROLAR PARA VER MAIS</span>
+        </div>        <div class="add-game-section">
           <h3>Adicione seu jogo</h3>
           <button class="big-pixel-button add-game-btn" type="button" id="adicionar-jogo-btn">+ Submeter Jogo</button>
-        </div>
-      </section>
+        </div>      </section>
     </main>
 
     <!-- Modal para adicionar/editar jogo -->
@@ -78,18 +89,18 @@
       <div class="modal-content pixel-box">
         <span class="close-modal">&times;</span>
         <h2 class="form-title">Adicionar Novo Jogo</h2>
-        
+
         <form id="form-jogo">
           <div class="form-group">
             <label for="titulo">Título do Jogo:</label>
             <input type="text" id="titulo" name="titulo" required>
           </div>
-          
+
           <div class="form-group">
             <label for="autor">Autor:</label>
             <input type="text" id="autor" name="autor" required>
           </div>
-            <div class="form-group">
+          <div class="form-group">
             <label for="categoria">Categoria:</label>
             <select id="categoria" name="categoria" required>
               <option value="">Selecione uma categoria</option>
@@ -101,18 +112,18 @@
               <option value="estrategia">Estratégia</option>
             </select>
           </div>
-          
+
           <div class="form-group">
             <label for="linkJogo">Link do Jogo:</label>
             <input type="url" id="linkJogo" name="linkJogo" required placeholder="https://...">
           </div>
-          
+
           <div class="form-group">
             <label for="thumbnail">Thumbnail:</label>
             <input type="file" id="thumbnail" name="thumbnail" accept="image/*">
             <small>Formato recomendado: 300x200px. Máximo 2MB.</small>
           </div>
-          
+
           <div class="form-actions">
             <button type="button" class="pixel-button cancel-btn">Cancelar</button>
             <button type="submit" class="pixel-button submit-btn">Salvar Jogo</button>

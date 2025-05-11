@@ -1,0 +1,140 @@
+/* Estilos para o botão "Voltar ao topo" presente em todas as páginas */
+.back-to-top {
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  width: 40px;
+  height: 40px;
+  background-color: var(--primary);
+  border: 2px solid var(--light);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  cursor: pointer;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.3);
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(20px);
+  transition: all 0.3s ease;
+  z-index: 100;
+}
+
+/* Adiciona estilo para foco do teclado para acessibilidade */
+.back-to-top:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(255, 120, 0, 0.6), 0 0 0 1px var(--light);
+  transform: translateY(0);
+  opacity: 1;
+  visibility: visible;
+}
+
+.back-to-top:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.4);
+}
+
+.back-to-top.visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+  animation: pulse-button 2s infinite;
+}
+
+@keyframes pulse-button {
+  0% {
+    box-shadow: 0 0 0 0 rgba(255, 120, 0, 0.7);
+  }
+  70% {
+    box-shadow: 0 0 0 10px rgba(255, 120, 0, 0);
+  }
+  100% {
+    box-shadow: 0 0 0 0 rgba(255, 120, 0, 0);
+  }
+}
+
+.back-to-top i {
+  color: var(--dark);
+  font-size: 1.2rem;
+}
+
+/* Aumentar tamanho do botão em dispositivos muito pequenos para melhor área de toque */
+@media (max-width: 360px) {
+  .back-to-top {
+    width: 45px;
+    height: 45px;
+    right: 15px;
+    bottom: 15px;
+  }
+  
+  .back-to-top i {
+    font-size: 1.3rem;
+  }
+}
+
+/* Tratamento para dispositivos muito pequenos */
+@media (max-width: 320px) {
+  .back-to-top {
+    width: 40px;
+    height: 40px;
+    right: 10px;
+    bottom: 10px;
+  }
+}
+
+/* Tratamento para telas grandes */
+@media (min-width: 1400px) {
+  .back-to-top {
+    width: 50px;
+    height: 50px;
+    right: 30px;
+    bottom: 30px;
+  }
+  
+  .back-to-top i {
+    font-size: 1.5rem;
+  }
+}
+
+/* Suporte para usuários que preferem menos animações */
+@media (prefers-reduced-motion: reduce) {
+  .back-to-top {
+    transition: opacity 0.3s ease;
+  }
+  
+  .back-to-top.visible {
+    animation: none;
+    transform: none;
+  }
+  
+  .back-to-top:hover {
+    transform: none;
+  }
+}
+
+/* Suporte para usuários que preferem alto contraste */
+@media (prefers-contrast: high) {
+  .back-to-top {
+    background-color: #fff;
+    border: 3px solid #000;
+  }
+  
+  .back-to-top i {
+    color: #000;
+  }
+}
+
+/* Suporte para modo escuro */
+@media (prefers-color-scheme: dark) {
+  .back-to-top {
+    background-color: var(--primary);
+    border-color: var(--light);
+  }
+}
+
+/* Suporte para modo claro */
+@media (prefers-color-scheme: light) {
+  .back-to-top {
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.5);
+  }
+}

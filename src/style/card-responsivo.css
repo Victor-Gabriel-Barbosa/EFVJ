@@ -156,27 +156,6 @@
   color: var(--accent);
 }
 
-/* Estrelas de avaliação aprimoradas */
-.pixel-star {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAATklEQVQoU2NkIAIwEqFGR0fn/////99nZGRcgm4HVgM0NDT+Q1XtZ2RkXIxuKFYDNDQ0/kPVYLUEpwHoajFcg9cAZDUYAUe0Aeh+xBp4ABw2HD/cOdXJAAAAAElFTkSuQmCC');
-  background-size: contain;
-  background-repeat: no-repeat;
-  image-rendering: pixelated;
-  margin-right: 2px;
-}
-
-.pixel-star.filled {
-  filter: invert(71%) sepia(77%) saturate(2059%) hue-rotate(359deg) brightness(102%) contrast(105%);
-}
-
-.pixel-star.half-filled {
-  background-image: url('data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAwAAAAMCAYAAABWdVznAAAATklEQVQoU2NkIAIwEqFGR0fn/////99nZGRcgm4HVgM0NDT+Q1XtZ2RkXIxuKFYDNDQ0/kPVYLUEpwHoajFcg9cAZDUYAUe0Aeh+xBp4ABw2HD/cOdXJAAAAAElFTkSuQmCC');
-  filter: invert(45%) sepia(60%) saturate(1500%) hue-rotate(329deg) brightness(102%) contrast(95%);
-}
-
 /* Avaliações detalhadas por categoria */
 .category-ratings {
   display: flex;

@@ -85,6 +85,9 @@ function inicializarPaginaJogos() {
 
 // Adiciona listeners comuns a todas as páginas
 function adicionarListenersComuns() {
+  // Cria e configura o botão "Voltar ao topo"
+  criarBotaoVoltarAoTopo();
+  
   // Exemplo: Animação ao clicar em botões
   const buttons = document.querySelectorAll('.pixel-button, .big-pixel-button');
   buttons.forEach(button => {
@@ -103,9 +106,107 @@ function adicionarListenersComuns() {
     // Atualiza status do usuário quando o evento for disparado
     atualizarStatusUsuario(event.detail);
   });
-
   document.addEventListener('userLoggedOut', () => {
     // Atualiza status quando o usuário fizer logout
     atualizarStatusUsuario(null);
   });
 }
+
+// Cria e configura o botão "Voltar ao topo" para todas as páginas
+function criarBotaoVoltarAoTopo() {
+  // Verifica se o botão já existe na página
+  if (!document.querySelector('.back-to-top')) {
+    // Cria o elemento do botão
+    const backToTopBtn = document.createElement('div');
+    backToTopBtn.className = 'back-to-top';
+    backToTopBtn.setAttribute('aria-label', 'Voltar ao topo da página');
+    backToTopBtn.setAttribute('role', 'button');
+    backToTopBtn.setAttribute('tabindex', '0');
+    backToTopBtn.innerHTML = '<i class="fas fa-chevron-up"></i>';
+    
+    // Adiciona o botão ao final do body
+    document.body.appendChild(backToTopBtn);
+    
+    // Adiciona o evento de click
+    backToTopBtn.addEventListener('click', voltarAoTopo);
+    
+    // Adiciona suporte para navegação por teclado
+    backToTopBtn.addEventListener('keydown', function(e) {
+      // Ativa quando Enter ou Espaço são pressionados
+      if (e.key === 'Enter' || e.key === ' ') {
+        e.preventDefault();
+        voltarAoTopo();
+      }
+    });
+    
+    // Adiciona feedback visual para dispositivos de toque
+    backToTopBtn.addEventListener('touchstart', function() {
+      backToTopBtn.style.transform = 'scale(0.95)';
+    });
+    
+    backToTopBtn.addEventListener('touchend', function() {
+      backToTopBtn.style.transform = 'scale(1)';
+    });
+    
+    // Configura a visibilidade do botão baseado na rolagem
+    window.addEventListener('scroll', handleBackToTopVisibility);
+    
+    // Verifica imediatamente a visibilidade ao carregar
+    handleBackToTopVisibility();
+  }
+}
+
+// Função para rolar suavemente para o topo
+function voltarAoTopo() {
+  window.scrollTo({
+    top: 0,
+    behavior: 'smooth'
+  });
+}
+
+// Controla a visibilidade do botão "Voltar ao topo" baseado na posição de rolagem
+function handleBackToTopVisibility() {
+  const backToTopBtn = document.querySelector('.back-to-top');
+  if (!backToTopBtn) return;
+  
+  const scrollPosition = window.scrollY;
+  const windowHeight = window.innerHeight;
+  const documentHeight = document.documentElement.scrollHeight;
+  
+  // Mostra o botão quando rolar mais de 300px ou 30% da altura da janela
+  // (o que for menor) e esconde quando estiver próximo do topo
+  const threshold = Math.min(300, windowHeight * 0.3);
+  
+  if (scrollPosition > threshold) {
+    if (!backToTopBtn.classList.contains('visible')) {
+      backToTopBtn.classList.add('visible');
+    }
+  } else {
+    if (backToTopBtn.classList.contains('visible')) {
+      backToTopBtn.classList.remove('visible');
+    }
+  }
+  
+  // Se estiver no final da página, posiciona o botão acima do rodapé
+  const footer = document.querySelector('footer');
+  if (footer) {
+    const footerTop = footer.getBoundingClientRect().top;
+    if (footerTop <= windowHeight) {
+      const distanceFromFooter = windowHeight - footerTop + 10;
+      backToTopBtn.style.bottom = `${distanceFromFooter}px`;
+    } else {
+      backToTopBtn.style.bottom = '20px';
+    }
+  }
+}
+
+// Otimização para limitar a frequência de verificações durante rolagem
+let scrollTimeout;
+window.addEventListener('scroll', function() {
+  if (!scrollTimeout) {
+    scrollTimeout = setTimeout(function() {
+      handleBackToTopVisibility();
+      scrollTimeout = null;
+    }, 100);
+  }
+});
