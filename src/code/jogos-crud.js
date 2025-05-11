@@ -135,29 +135,54 @@ async function adicionarJogo(evento) {
   }
 
   const formulario = document.getElementById('form-jogo');
-  const btnSubmit = formulario.querySelector('button[type="submit"]');
+  if (!formulario) {
+    console.error("Formulário de jogo não encontrado.");
+    alert("Erro ao acessar o formulário. Por favor, recarregue a página e tente novamente.");
+    return;
+  }
 
+  const btnSubmit = formulario.querySelector('button[type="submit"]');
+  if (!btnSubmit) {
+    console.error("Botão de submit não encontrado no formulário.");
+    return;
+  }
   try {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Salvando...';    // Obtém valores do formulário
+    btnSubmit.textContent = 'Salvando...';
+    
+    // Obtém valores do formulário com verificações de segurança
+    if (!formulario.titulo || !formulario.categoria || !formulario.linkJogo) {
+      throw new Error("Campos obrigatórios do formulário não encontrados");
+    }
+    
     const titulo = formulario.titulo.value;
-    const autor = formulario.autor.value || currentUser.displayName;
+    const autor = formulario.autor && formulario.autor.value ? formulario.autor.value : currentUser.displayName;
     const categoria = formulario.categoria.value;
-    const linkJogo = formulario.linkJogo.value;
-
-    // Upload da thumbnail se fornecida
+    const linkJogo = formulario.linkJogo.value;// Upload da thumbnail se fornecida
     let thumbnailUrl = 'assets/default-game.png';
     const thumbnailInput = formulario.thumbnail;
 
-    if (thumbnailInput.files.length > 0) {
-      const file = thumbnailInput.files[0];
-      const filename = `${Date.now()}_${file.name}`;
-      const storageRef = storage.ref(`thumbnails/${filename}`);
-      
-      // Usar os metadados customizados para resolver problema de CORS
-      await storageRef.put(file, metadataStorage);
-      thumbnailUrl = await storageRef.getDownloadURL();
-    }    // Criar documento no Firestore com os dados do usuário
+    try {
+      if (thumbnailInput && thumbnailInput.files && thumbnailInput.files.length > 0) {
+        const file = thumbnailInput.files[0];
+        const filename = `${Date.now()}_${file.name}`;
+        
+        // Verifica se o storage está disponível
+        if (!storage) {
+          console.error("Firebase Storage não está inicializado");
+          throw new Error("Erro ao acessar o Firebase Storage");
+        }
+        
+        const storageRef = storage.ref(`thumbnails/${filename}`);
+        
+        // Usar os metadados customizados para resolver problema de CORS
+        await storageRef.put(file, metadataStorage);
+        thumbnailUrl = await storageRef.getDownloadURL();
+      }
+    } catch (uploadError) {
+      console.error("Erro ao fazer upload da imagem:", uploadError);
+      throw new Error("Falha ao fazer upload da imagem. Por favor, tente novamente.");
+    }// Criar documento no Firestore com os dados do usuário
     await jogosCollection.add({
       titulo,
       autor,
@@ -402,10 +427,21 @@ function fecharModal() {
 function salvarJogo(evento) {
   evento.preventDefault();
 
-  const formulario = document.getElementById('form-jogo');
-  const jogoId = formulario.querySelector('input[name="jogoId"]')?.value;
+  try {
+    const formulario = document.getElementById('form-jogo');
+    if (!formulario) {
+      console.error("Formulário não encontrado");
+      alert("Erro ao encontrar o formulário. Por favor, recarregue a página.");
+      return;
+    }
+    
+    const jogoId = formulario.querySelector('input[name="jogoId"]')?.value;
 
-  (jogoId) ? atualizarJogo(evento, jogoId) : adicionarJogo(evento);
+    (jogoId) ? atualizarJogo(evento, jogoId) : adicionarJogo(evento);
+  } catch (err) {
+    console.error("Erro ao processar formulário:", err);
+    alert("Erro ao processar o formulário: " + err.message);
+  }
 }
 
 // Inicialização
