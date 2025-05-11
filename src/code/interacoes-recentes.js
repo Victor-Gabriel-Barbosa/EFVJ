@@ -16,8 +16,10 @@ function loadRecentInteractions() {
   if (!interacoesContainer) return;
   
   interacoesContainer.innerHTML = '<p class="loading-message">Carregando interações recentes...</p>';
-  
-  // Busca atividades recentes
+    // Busca atividades recentes
+  // IMPORTANTE: Esta consulta requer um índice composto no Firestore.
+  // Acesse o link fornecido no erro para criar o índice necessário:
+  // https://console.firebase.google.com/v1/r/project/eufacovcjoga/firestore/indexes?create_composite=Ck9wcm9qZWN0cy9ldWZhY292Y2pvZ2EvZGF0YWJhc2VzLyhkZWZhdWx0KS9jb2xsZWN0aW9uR3JvdXBzL2F0aXZpZGFkZXMvaW5kZXhlcy9fEAEaCAoEdGlwbxABGggKBGRhdGEQAhoMCghfX25hbWVfXxAC
   atividadesCollection
     .where('tipo', 'in', ['avaliacao', 'cadastro_jogo', 'comentario'])
     .orderBy('data', 'desc')

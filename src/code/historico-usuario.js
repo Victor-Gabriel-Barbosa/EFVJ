@@ -1,10 +1,4 @@
-// historio-usuario.js - Funções para exibir histórico de atividades do usuário
-
-// Elementos da interface
-const activityTimeline = document.getElementById('activity-timeline');
-const statsContainer = document.getElementById('user-stats');
-const lastLoginTime = document.getElementById('last-login-time');
-const achievementsList = document.getElementById('achievements-list');
+// Funções para exibir histórico de atividades do usuário
 
 // Função para carregar o histórico completo de atividades do usuário
 function loadUserActivityHistory(userId) {
