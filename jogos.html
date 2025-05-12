@@ -4,12 +4,13 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Jogos | Eu Faço Você Joga</title>  <link rel="stylesheet" href="src/style/styles.css">
+  <title>Jogos | Eu Faço Você Joga</title>
+  <link rel="stylesheet" href="src/style/styles.css">
   <link rel="stylesheet" href="src/style/card-responsivo.css">
   <link rel="stylesheet" href="src/style/grid-responsiva.css">
-  <link rel="stylesheet" href="src/style/filtros.css">  <link rel="stylesheet" href="src/style/animacoes.css">  
+  <link rel="stylesheet" href="src/style/filtros.css">
+  <link rel="stylesheet" href="src/style/animacoes.css">
   <link rel="stylesheet" href="src/style/game-stats.css">
-  <link rel="stylesheet" href="src/style/scroll-indicator.css">
   <link rel="stylesheet" href="src/style/back-to-top.css">
   <link rel="stylesheet" href="src/style/navbar-responsive.css">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
@@ -20,9 +21,8 @@
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-storage-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-auth-compat.js"></script>
-  <!-- Adiciona o script da barra de navegação -->  <script src="src/code/navbar.js"></script>
-  <!-- Adiciona script para efeitos de rolagem nas estatísticas -->
-  <script src="src/code/stats-scroll.js"></script>
+  <!-- Adiciona o script da barra de navegação -->
+  <script src="src/code/navbar.js"></script>
   <!-- Adiciona a logo da aplicação -->
   <link rel="icon" href="src/images/favicon/favicon.ico" type="image/x-icon">
 </head>
@@ -59,7 +59,8 @@
         <div class="games-stats">
           <div class="games-counter">
             <i class="fas fa-gamepad"></i>
-            <span class="counter-text">Exibindo <span class="filtered-count">0</span> de <span class="total-count">0</span> jogos</span>
+            <span class="counter-text">Exibindo <span class="filtered-count">0</span> de <span
+                class="total-count">0</span> jogos</span>
           </div>
           <div class="games-sort">
             <span class="sort-label">Ordenar por:</span>
@@ -70,18 +71,17 @@
               <option value="titulo">Título (A-Z)</option>
             </select>
           </div>
-        </div>        <div class="games-grid">
-          <!-- Jogos serão adicionados aqui via JavaScript -->
         </div>
 
-        <!-- Indicador de rolagem -->
-        <div class="scroll-indicator">
-          <i class="fas fa-chevron-down scroll-indicator-icon"></i>
-          <span class="scroll-indicator-text">ROLAR PARA VER MAIS</span>
-        </div>        <div class="add-game-section">
+        <div class="games-grid">
+          <!-- Jogos serão adicionados aqui via JavaScript -->
+        </div>
+        
+        <div class="add-game-section">
           <h3>Adicione seu jogo</h3>
           <button class="big-pixel-button add-game-btn" type="button" id="adicionar-jogo-btn">+ Submeter Jogo</button>
-        </div>      </section>
+        </div>
+      </section>
     </main>
 
     <!-- Modal para adicionar/editar jogo -->
