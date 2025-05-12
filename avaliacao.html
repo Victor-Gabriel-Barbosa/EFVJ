@@ -3,12 +3,14 @@
 
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Avaliação | Eu Faço Você Joga</title>  <link rel="stylesheet" href="src/style/styles.css">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Avaliação | Eu Faço Você Joga</title>
+  <link rel="stylesheet" href="src/style/styles.css">
   <link rel="stylesheet" href="src/style/back-to-top.css">
   <link rel="stylesheet" href="src/style/navbar-responsive.css">
   <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
-  
+
   <!-- Firebase SDK -->
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-app-compat.js"></script>
   <script src="https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore-compat.js"></script>
@@ -47,12 +49,14 @@
               <option value="">-- Escolha um jogo --</option>
               <!-- Opções serão carregadas via JavaScript -->
             </select>
-          </div>          <!-- Avaliação por categoria -->
+          </div> <!-- Avaliação por categoria -->
           <div class="categories-rating">
-            <h3 class="category-title">Avaliação por Categoria</h3>            <div class="category-rating">
+            <h3 class="category-title">Avaliação por Categoria</h3>
+            <div class="category-rating">
               <label>Som (Áudio e trilha sonora):
                 <span class="tooltip">?
-                  <span class="tooltip-text">Avalia a qualidade dos efeitos sonoros e músicas, incluindo a trilha sonora e como ela se integra à experiência do jogo.</span>
+                  <span class="tooltip-text">Avalia a qualidade dos efeitos sonoros e músicas, incluindo a trilha sonora
+                    e como ela se integra à experiência do jogo.</span>
                 </span>
               </label>
               <div class="number-rating" data-category="som">
@@ -63,7 +67,8 @@
             <div class="category-rating">
               <label>Criatividade e inovação:
                 <span class="tooltip">?
-                  <span class="tooltip-text">Avalia quão original, criativo e inovador é o jogo em termos de mecânicas, conceitos e ideias.</span>
+                  <span class="tooltip-text">Avalia quão original, criativo e inovador é o jogo em termos de mecânicas,
+                    conceitos e ideias.</span>
                 </span>
               </label>
               <div class="number-rating" data-category="criatividade">
@@ -74,7 +79,8 @@
             <div class="category-rating">
               <label>Jogabilidade e Mecânica:
                 <span class="tooltip">?
-                  <span class="tooltip-text">Avalia a fluídez, responsividade e qualidade dos controles e mecânicas de jogo.</span>
+                  <span class="tooltip-text">Avalia a fluídez, responsividade e qualidade dos controles e mecânicas de
+                    jogo.</span>
                 </span>
               </label>
               <div class="number-rating" data-category="jogabilidade">
@@ -85,7 +91,8 @@
             <div class="category-rating">
               <label>Design (de mundo e personagens):
                 <span class="tooltip">?
-                  <span class="tooltip-text">Avalia a qualidade visual, estética e design dos ambientes, personagens e elementos do jogo.</span>
+                  <span class="tooltip-text">Avalia a qualidade visual, estética e design dos ambientes, personagens e
+                    elementos do jogo.</span>
                 </span>
               </label>
               <div class="number-rating" data-category="design">
@@ -96,7 +103,8 @@
             <div class="category-rating">
               <label>História e Narrativa:
                 <span class="tooltip">?
-                  <span class="tooltip-text">Avalia a qualidade do enredo, narrativa, diálogos e construção de mundo do jogo.</span>
+                  <span class="tooltip-text">Avalia a qualidade do enredo, narrativa, diálogos e construção de mundo do
+                    jogo.</span>
                 </span>
               </label>
               <div class="number-rating" data-category="historia">
@@ -107,7 +115,8 @@
             <div class="category-rating">
               <label>Análise de Bugs:
                 <span class="tooltip">?
-                  <span class="tooltip-text">Avalia a presença ou ausência de bugs, glitches e problemas técnicos no jogo.</span>
+                  <span class="tooltip-text">Avalia a presença ou ausência de bugs, glitches e problemas técnicos no
+                    jogo.</span>
                 </span>
               </label>
               <div class="number-rating" data-category="bugs">
@@ -118,7 +127,8 @@
             <div class="category-rating">
               <label>Interatividade com o mundo:
                 <span class="tooltip">?
-                  <span class="tooltip-text">Avalia o quanto o jogador pode interagir com o ambiente e como o mundo do jogo responde às ações do jogador.</span>
+                  <span class="tooltip-text">Avalia o quanto o jogador pode interagir com o ambiente e como o mundo do
+                    jogo responde às ações do jogador.</span>
                 </span>
               </label>
               <div class="number-rating" data-category="interatividade">
@@ -141,7 +151,8 @@
       <section class="pixel-box">
         <h2 class="pixel-subtitle">Ranking dos Jogos</h2>
         <div class="ranking-options">
-          <label for="ranking-category">Filtrar por categoria:</label>          <select id="ranking-category" class="pixel-select">
+          <label for="ranking-category">Filtrar por categoria:</label> <select id="ranking-category"
+            class="pixel-select">
             <option value="geral">Avaliação Geral</option>
             <option value="som">Som (Áudio e trilha sonora)</option>
             <option value="criatividade">Criatividade e inovação</option>
@@ -151,7 +162,8 @@
             <option value="bugs">Análise de Bugs</option>
             <option value="interatividade">Interatividade com o mundo</option>
           </select>
-        </div>        <table id="ranking-table" class="ranking-table">
+        </div>
+        <table id="ranking-table" class="ranking-table">
           <thead>
             <tr class="ranking-header">
               <th class="rank-column">Posição</th>

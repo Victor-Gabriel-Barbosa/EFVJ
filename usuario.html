@@ -2,7 +2,10 @@
 <html lang="pt-BR">
 
 <head>
-  <meta charset="UTF-8">  <meta name="viewport" content="width=device-width, initial-scale=1.0">  <title>Meu Perfil | Eu Faço Você Joga</title>  <link rel="stylesheet" href="src/style/styles.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Meu Perfil | Eu Faço Você Joga</title>
+  <link rel="stylesheet" href="src/style/styles.css">
   <link rel="stylesheet" href="src/style/user-profile.css">
   <link rel="stylesheet" href="src/style/back-to-top.css">
   <link rel="stylesheet" href="src/style/navbar-responsive.css">
@@ -35,14 +38,14 @@
       <section id="login-section" class="pixel-box">
         <h2 class="pixel-subtitle">Acesse sua conta</h2>
         <p>Faça login para submeter seus jogos, fazer avaliações e personalizar sua experiência.</p>
-        
+
         <div class="login-buttons">
           <button id="google-login" class="pixel-button login-btn">
             <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" alt="Google logo" width="18">
             Entrar com Google
           </button>
         </div>
-      </section>      <!-- Seção de perfil (mostrada quando o usuário está logado) -->
+      </section> <!-- Seção de perfil (mostrada quando o usuário está logado) -->
       <section id="profile-section" class="pixel-box hidden" style="display: none;">
         <div class="profile-header">
           <div class="profile-avatar">
@@ -55,7 +58,7 @@
           </div>
           <button id="logout-btn" class="pixel-button">Sair</button>
         </div>
-        
+
         <div class="profile-content">
           <!-- Estatísticas do usuário -->
           <h3 class="section-title">Estatísticas</h3>
@@ -63,32 +66,34 @@
             <!-- Estatísticas serão carregadas aqui -->
             <p class="loading-message">Carregando estatísticas...</p>
           </div>
-          
+
           <h3 class="section-title">Meus Jogos</h3>
           <div id="user-games" class="games-grid">
             <!-- Jogos do usuário serão carregados aqui -->
-            <p class="no-games-message">Você ainda não enviou nenhum jogo. <a href="jogos.html" class="text-link">Submeta seu primeiro jogo!</a></p>
+            <p class="no-games-message">Você ainda não enviou nenhum jogo. <a href="jogos.html"
+                class="text-link">Submeta seu primeiro jogo!</a></p>
           </div>
-          
+
           <h3 class="section-title">Minhas Avaliações</h3>
           <div id="user-reviews" class="reviews-list">
             <!-- Avaliações do usuário serão carregadas aqui -->
-            <p class="no-reviews-message">Você ainda não fez nenhuma avaliação. <a href="avaliacao.html" class="text-link">Avalie um jogo!</a></p>
+            <p class="no-reviews-message">Você ainda não fez nenhuma avaliação. <a href="avaliacao.html"
+                class="text-link">Avalie um jogo!</a></p>
           </div>
-          
+
           <!-- Conquistas do usuário -->
           <h3 class="section-title">Conquistas</h3>
           <div id="achievements-list" class="achievements-container">
             <!-- Conquistas serão carregadas aqui -->
             <p class="loading-message">Carregando conquistas...</p>
           </div>
-            <!-- Histórico de atividades -->
+          <!-- Histórico de atividades -->
           <h3 class="section-title">Histórico de Atividades</h3>
           <div id="activity-timeline" class="activity-container">
             <!-- Histórico de atividades será carregado aqui -->
             <p class="loading-message">Carregando histórico de atividades...</p>
           </div>
-          
+
           <!-- Interações recentes na plataforma -->
           <h3 class="section-title">Interações Recentes na Plataforma</h3>
           <div id="interacoes-recentes" class="interacoes-container">
@@ -104,7 +109,9 @@
         <p>© 2025 Eu Faço Você Joga | Criado por Victor-Gabriel-Barbosa</p>
       </div>
     </footer>
-  </div>  <!-- Scripts -->
+  </div>
+
+  <!-- Scripts -->
   <script src="src/code/firebase-config.js"></script>
   <script src="src/code/auth.js"></script>
   <script src="src/code/historico-usuario.js"></script>
