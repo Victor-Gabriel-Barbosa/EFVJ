@@ -1,21 +1,4 @@
-// Constantes para upload de arquivos
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB em bytes
-const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
-
-// Função para validar arquivo de imagem
-function validarArquivoImagem(file) {
-  // Verifica se é uma imagem
-  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
-    throw new Error(`Tipo de arquivo não suportado. Use apenas: JPG, PNG, GIF, WEBP ou SVG.`);
-  }
-  
-  // Verifica o tamanho do arquivo
-  if (file.size > MAX_FILE_SIZE) {
-    throw new Error(`O arquivo é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE/1024/1024}MB.`);
-  }
-  
-  return true;
-}
+// Funções para manipulação de jogos no Firestore
 
 // Função auxiliar para gerar metadados do Storage com tipo de conteúdo adequado
 function criarMetadados(file) {
@@ -36,18 +19,6 @@ function criarMetadados(file) {
     }
   };
 };
-
-// Configura o Storage para permitir CORS
-function configurarStoragePublico(storageRef) {
-  // Define metadados que permitem acesso público
-  const metadata = {
-    cacheControl: 'public,max-age=31536000',
-  };
-  
-  return metadata;
-}
-
-// Funções para manipulação de jogos no Firestore
 
 // Função para carregar todos os jogos
 async function carregarJogos() {
@@ -243,14 +214,8 @@ function ajustarTextoContadorResponsivo() {
   const counterText = document.querySelector('.counter-text');
   if (!counterText) return;
   
-  const filteredElem = document.querySelector('.filtered-count');
-  const totalElem = document.querySelector('.total-count');
-  
-  // Verifica se os elementos existem antes de continuar
-  if (!filteredElem || !totalElem) return;
-  
-  const filteredCount = filteredElem.textContent;
-  const totalCount = totalElem.textContent;
+  const filteredCount = document.querySelector('.filtered-count').textContent;
+  const totalCount = document.querySelector('.total-count').textContent;
   
   // Verifica o tamanho da tela e ajusta o texto conforme necessário
   if (window.innerWidth <= 320) {
@@ -292,12 +257,8 @@ function atualizarContadores() {
   const totalJogos = document.querySelectorAll('.game-card').length;
   const jogosFiltrados = document.querySelectorAll('.game-card[style="display: block;"], .game-card:not([style*="display"])').length;
   
-  // Verifica se os elementos existem antes de atualizá-los
-  const totalCountElem = document.querySelector('.total-count');
-  const filteredCountElem = document.querySelector('.filtered-count');
-  
-  if (totalCountElem) totalCountElem.textContent = totalJogos;
-  if (filteredCountElem) filteredCountElem.textContent = jogosFiltrados;
+  document.querySelector('.total-count').textContent = totalJogos;
+  document.querySelector('.filtered-count').textContent = jogosFiltrados;
   
   // Aplica responsividade ao texto do contador
   ajustarTextoContadorResponsivo();
@@ -373,40 +334,26 @@ async function adicionarJogo(evento) {
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value || currentUser.displayName;
     const categoria = formulario.categoria.value;
-    const linkJogo = formulario.linkJogo.value;
-
-    // Upload da thumbnail se fornecida
+    const linkJogo = formulario.linkJogo.value;    // Upload da thumbnail se fornecida
     let thumbnailUrl = 'assets/default-game.png';
-    const thumbnailInput = formulario.thumbnail;    if (thumbnailInput.files.length > 0) {
+    const thumbnailInput = formulario.thumbnail;
+
+    if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
       
-      // Valida o arquivo de imagem
-      validarArquivoImagem(file);
+      // Verifica se o arquivo é uma imagem
+      if (!file.type.startsWith('image/')) {
+        throw new Error('O arquivo enviado não é uma imagem válida.');
+      }
       
       const filename = `${Date.now()}_${file.name}`;
       const storageRef = storage.ref(`thumbnails/${filename}`);
       
-      try {
-        // Usa metadados específicos para o tipo de arquivo
-        const metadata = criarMetadados(file);
-        
-        // Configura o Storage para acesso público
-        const publicMetadata = configurarStoragePublico(storageRef);
-        
-        // Combina os metadados
-        const combinedMetadata = { ...metadata, ...publicMetadata };
-        
-        // Faz upload com os metadados combinados
-        await storageRef.put(file, combinedMetadata);
-        
-        // Obtém a URL com um token de download
-        thumbnailUrl = await storageRef.getDownloadURL();
-        console.log("Upload bem-sucedido, URL:", thumbnailUrl);
-      } catch (uploadError) {
-        console.error("Erro específico de upload:", uploadError);
-        throw new Error(`Erro ao fazer upload da imagem: ${uploadError.message}`);
-      }
-    }    
+      // Usa metadados específicos para o tipo de arquivo
+      const metadata = criarMetadados(file);
+      await storageRef.put(file, metadata);
+      thumbnailUrl = await storageRef.getDownloadURL();
+    }
     // Cria documento no Firestore com os dados do usuário
     await jogosCollection.add({
       titulo,
@@ -433,12 +380,9 @@ async function adicionarJogo(evento) {
       alert("Erro: Você não tem permissão para fazer upload de arquivos.");
     } else if (error.code === 'storage/canceled') {
       alert("O upload foi cancelado.");
-    } else if (error.code === 'storage/cors-error' || error.message.includes('CORS')) {
-      alert("Erro de CORS: Verifique se o Firebase está configurado para permitir solicitações do seu domínio.");
-      console.error("Detalhes do erro CORS:", error);
     } else if (error.code === 'storage/unknown') {
       alert("Erro desconhecido no upload. Verifique o console para mais detalhes.");
-    } else if (error.message && error.message.includes('arquivo')) {
+    } else if (error.message.includes('não é uma imagem')) {
       alert(error.message);
     } else {
       alert("Erro ao adicionar jogo. Por favor, tente novamente.");
@@ -470,8 +414,7 @@ async function abrirFormularioEdicao(jogoId) {
 
     // Preenche o formulário com os dados atuais
     const formulario = document.getElementById('form-jogo');
-    formulario.reset();    
-    formulario.titulo.value = jogo.titulo;
+    formulario.reset();    formulario.titulo.value = jogo.titulo;
     formulario.autor.value = jogo.autor;
     formulario.categoria.value = jogo.categoria;
     formulario.linkJogo.value = jogo.linkJogo;
@@ -538,38 +481,23 @@ async function atualizarJogo(evento, jogoId) {
       categoria,
       linkJogo,
       dataAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
-    };
-
-    // Upload da thumbnail se fornecida
-    const thumbnailInput = formulario.thumbnail;    if (thumbnailInput.files.length > 0) {
+    };    // Upload da thumbnail se fornecida
+    const thumbnailInput = formulario.thumbnail;
+    if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
       
-      // Valida o arquivo de imagem
-      validarArquivoImagem(file);
+      // Verifica se o arquivo é uma imagem
+      if (!file.type.startsWith('image/')) {
+        throw new Error('O arquivo enviado não é uma imagem válida.');
+      }
       
       const filename = `${Date.now()}_${file.name}`;
       const storageRef = storage.ref(`thumbnails/${filename}`);
       
-      try {
-        // Usa metadados específicos para o tipo de arquivo
-        const metadata = criarMetadados(file);
-        
-        // Configura o Storage para acesso público
-        const publicMetadata = configurarStoragePublico(storageRef);
-        
-        // Combina os metadados
-        const combinedMetadata = { ...metadata, ...publicMetadata };
-        
-        // Faz upload com os metadados combinados
-        await storageRef.put(file, combinedMetadata);
-        
-        // Obtém a URL com um token de download
-        dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
-        console.log("Upload bem-sucedido, URL:", dadosAtualizados.thumbnailUrl);
-      } catch (uploadError) {
-        console.error("Erro específico de upload:", uploadError);
-        throw new Error(`Erro ao fazer upload da imagem: ${uploadError.message}`);
-      }
+      // Usa metadados específicos para o tipo de arquivo
+      const metadata = criarMetadados(file);
+      await storageRef.put(file, metadata);
+      dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
     }
 
     // Atualiza documento no Firestore
@@ -579,24 +507,10 @@ async function atualizarJogo(evento, jogoId) {
     await carregarJogos();
     fecharModal();
 
-    alert('Jogo atualizado com sucesso!');  } catch (error) {
+    alert('Jogo atualizado com sucesso!');
+  } catch (error) {
     console.error("Erro ao atualizar jogo:", error);
-    
-    // Mensagem de erro mais detalhada com base no tipo de erro
-    if (error.code === 'storage/unauthorized') {
-      alert("Erro: Você não tem permissão para fazer upload de arquivos.");
-    } else if (error.code === 'storage/canceled') {
-      alert("O upload foi cancelado.");
-    } else if (error.code === 'storage/cors-error' || error.message.includes('CORS')) {
-      alert("Erro de CORS: Verifique se o Firebase está configurado para permitir solicitações do seu domínio.");
-      console.error("Detalhes do erro CORS:", error);
-    } else if (error.code === 'storage/unknown') {
-      alert("Erro desconhecido no upload. Verifique o console para mais detalhes.");
-    } else if (error.message && error.message.includes('arquivo')) {
-      alert(error.message);
-    } else {
-      alert("Erro ao atualizar jogo. Por favor, tente novamente.");
-    }
+    alert("Erro ao atualizar jogo. Por favor, tente novamente.");
   } finally {
     btnSubmit.disabled = false;
     btnSubmit.textContent = 'Atualizar Jogo';
