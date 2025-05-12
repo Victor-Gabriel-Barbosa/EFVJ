@@ -11,49 +11,13 @@ function criarMetadados(file) {
   else if (fileName.endsWith('.webp')) contentType = 'image/webp';
   else if (fileName.endsWith('.svg')) contentType = 'image/svg+xml';
   
-  // Configurações para acesso público - evita problemas de CORS
+  // Gera um token único para cada upload
   return {
     contentType: contentType,
-    cacheControl: 'public, max-age=31536000',
     customMetadata: {
       'firebaseStorageDownloadTokens': Math.random().toString(36).substring(2) + Date.now().toString(36)
     }
   };
-};
-
-// Função para upload de imagem com tratamento melhorado para CORS
-async function uploadImagem(file, pasta = 'thumbnails') {
-  if (!file) return null;
-  
-  // Verifica se o arquivo é uma imagem
-  if (!file.type.startsWith('image/')) {
-    throw new Error('O arquivo enviado não é uma imagem válida.');
-  }
-  
-  // Gera um nome único para o arquivo
-  const filename = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9_.]/g, '_')}`;
-  const storageRef = storage.ref(`${pasta}/${filename}`);
-  
-  // Usa metadados específicos para o tipo de arquivo
-  const metadata = criarMetadados(file);
-  
-  // Faz o upload do arquivo
-  await storageRef.put(file, metadata);
-  
-  try {
-    // Tenta obter a URL de download direta
-    return await storageRef.getDownloadURL();
-  } catch (error) {
-    console.error("Erro ao obter URL de download:", error);
-    
-    // Alternativa baseada em URL com token
-    const token = metadata.customMetadata.firebaseStorageDownloadTokens;
-    const bucket = firebase.app().options.storageBucket;
-    const encodedFilename = encodeURIComponent(`${pasta}/${filename}`);
-    
-    // Constrói URL manualmente que não depende de CORS
-    return `https://firebasestorage.googleapis.com/v0/b/${bucket}/o/${encodedFilename}?alt=media&token=${token}`;
-  }
 };
 
 // Função para carregar todos os jogos
@@ -67,17 +31,6 @@ async function carregarJogos() {
     }
 
     jogosGrid.innerHTML = '<p class="loading-text">Carregando jogos...</p>';
-
-    // Se o utilitário de correção de URLs estiver disponível, tenta corrigir as URLs no Firebase
-    if (window.imageUrlFixer && typeof window.imageUrlFixer.corrigirUrlsFirebase === 'function') {
-      try {
-        // Tenta corrigir URLs com problemas no banco de dados
-        window.imageUrlFixer.corrigirUrlsFirebase();
-      } catch (error) {
-        console.warn("Erro ao tentar corrigir URLs:", error);
-        // Continua mesmo se a correção falhar
-      }
-    }
 
     const snapshot = await jogosCollection.get();
 
@@ -114,27 +67,7 @@ function criarElementoJogo(jogo, jogoId) {
   divJogo.dataset.category = jogo.categoria;
   divJogo.dataset.id = jogoId;
 
-  // Utiliza a URL da thumbnail com verificação de CORS, se disponível
-  let thumbnailUrl = jogo.thumbnailUrl || 'assets/default-game.png';
-  
-  // Verifica se o corretor de URLs está disponível
-  if (window.imageUrlFixer && typeof window.imageUrlFixer.verificarCorrigirUrl === 'function') {
-    // Marca o elemento para verificação posterior (após renderização)
-    divJogo.dataset.originalThumbnail = thumbnailUrl;
-    
-    // Inicia a verificação em segundo plano
-    window.imageUrlFixer.verificarCorrigirUrl(thumbnailUrl)
-      .then(urlCorrigida => {
-        if (urlCorrigida !== thumbnailUrl) {
-          // Atualiza a imagem se a URL foi corrigida
-          const thumbnail = divJogo.querySelector('.game-thumbnail');
-          if (thumbnail) {
-            thumbnail.style.setProperty('--bg-image', `url('${urlCorrigida}')`);
-          }
-        }
-      })
-      .catch(err => console.error('Erro ao verificar URL da thumbnail:', err));
-  }
+  const thumbnailUrl = jogo.thumbnailUrl || 'assets/default-game.png';
 
   // Verifica se o usuário atual é o criador do jogo
   const currentUser = window.userAuth?.currentUser();
@@ -163,14 +96,15 @@ function criarElementoJogo(jogo, jogoId) {
           `<div class="category-score">Original<span>${jogo.avaliacoesPorCategoria.originalidade.toFixed(1)}</span></div>` : ''}
       </div>
     `;
-  }  // Adiciona badge da categoria
+  }
+  // Adiciona badge da categoria
   const categoriaNome = jogo.categoria.charAt(0).toUpperCase() + jogo.categoria.slice(1);
   const badgeCategoria = `<div class="category-badge ${jogo.categoria}">${categoriaNome}</div>`;
 
   divJogo.innerHTML = `
     ${badgeCategoria}
     <a href="${jogo.linkJogo}" target="_blank" class="thumbnail-link">
-      <div class="game-thumbnail" style="--bg-image: url('${thumbnailUrl}')" data-thumbnail-url="${thumbnailUrl}"></div>
+      <div class="game-thumbnail" style="--bg-image: url('${thumbnailUrl}')"></div>
     </a>
     <div class="game-info">
       <h3>${jogo.titulo}</h3>
@@ -394,18 +328,31 @@ async function adicionarJogo(evento) {
 
   try {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Salvando...';     // Obtém valores do formulário
+    btnSubmit.textContent = 'Salvando...'; 
+
+    // Obtém valores do formulário
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value || currentUser.displayName;
     const categoria = formulario.categoria.value;
-    const linkJogo = formulario.linkJogo.value;
-    
-    // Upload da thumbnail se fornecida
+    const linkJogo = formulario.linkJogo.value;    // Upload da thumbnail se fornecida
     let thumbnailUrl = 'assets/default-game.png';
     const thumbnailInput = formulario.thumbnail;
 
     if (thumbnailInput.files.length > 0) {
-      thumbnailUrl = await uploadImagem(thumbnailInput.files[0], 'thumbnails');
+      const file = thumbnailInput.files[0];
+      
+      // Verifica se o arquivo é uma imagem
+      if (!file.type.startsWith('image/')) {
+        throw new Error('O arquivo enviado não é uma imagem válida.');
+      }
+      
+      const filename = `${Date.now()}_${file.name}`;
+      const storageRef = storage.ref(`thumbnails/${filename}`);
+      
+      // Usa metadados específicos para o tipo de arquivo
+      const metadata = criarMetadados(file);
+      await storageRef.put(file, metadata);
+      thumbnailUrl = await storageRef.getDownloadURL();
     }
     // Cria documento no Firestore com os dados do usuário
     await jogosCollection.add({
@@ -525,19 +472,32 @@ async function atualizarJogo(evento, jogoId) {
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value;
     const categoria = formulario.categoria.value;
-    const linkJogo = formulario.linkJogo.value;    // Dados a atualizar
+    const linkJogo = formulario.linkJogo.value;
+
+    // Dados a atualizar
     const dadosAtualizados = {
       titulo,
       autor,
       categoria,
       linkJogo,
       dataAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
-    };
-    
-    // Upload da thumbnail se fornecida
+    };    // Upload da thumbnail se fornecida
     const thumbnailInput = formulario.thumbnail;
     if (thumbnailInput.files.length > 0) {
-      dadosAtualizados.thumbnailUrl = await uploadImagem(thumbnailInput.files[0], 'thumbnails');
+      const file = thumbnailInput.files[0];
+      
+      // Verifica se o arquivo é uma imagem
+      if (!file.type.startsWith('image/')) {
+        throw new Error('O arquivo enviado não é uma imagem válida.');
+      }
+      
+      const filename = `${Date.now()}_${file.name}`;
+      const storageRef = storage.ref(`thumbnails/${filename}`);
+      
+      // Usa metadados específicos para o tipo de arquivo
+      const metadata = criarMetadados(file);
+      await storageRef.put(file, metadata);
+      dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
     }
 
     // Atualiza documento no Firestore
@@ -582,31 +542,15 @@ async function confirmarExclusao(jogoId) {
 async function excluirJogo(jogoId) {
   try {
     // Obtém a referência do jogo para pegar a URL da thumbnail
-    const doc = await jogosCollection.doc(jogoId).get();    if (doc.exists) {
+    const doc = await jogosCollection.doc(jogoId).get();
+
+    if (doc.exists) {
       const jogo = doc.data();
 
       // Exclui a thumbnail do Storage se não for a imagem padrão
       if (jogo.thumbnailUrl && !jogo.thumbnailUrl.includes('default-game.png')) {
-        try {
-          // Tenta extrair o caminho do arquivo da URL
-          let fileUrl = jogo.thumbnailUrl;
-          // Se for uma URL com token, extrai o caminho
-          if (fileUrl.includes('firebasestorage.googleapis.com')) {
-            const matches = fileUrl.match(/\/o\/([^?]+)/);
-            if (matches && matches[1]) {
-              const decodedPath = decodeURIComponent(matches[1]);
-              const thumbRef = storage.ref(decodedPath);
-              await thumbRef.delete();
-            }
-          } else {
-            // Se for uma URL direta do Storage
-            const thumbRef = storage.refFromURL(jogo.thumbnailUrl);
-            await thumbRef.delete();
-          }
-        } catch (error) {
-          console.error("Erro ao excluir thumbnail:", error);
-          // Continua mesmo se não conseguir excluir a imagem
-        }
+        const thumbRef = storage.refFromURL(jogo.thumbnailUrl);
+        await thumbRef.delete();
       }
 
       // Exclui o documento do Firestore
