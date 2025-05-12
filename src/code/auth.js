@@ -138,14 +138,17 @@ function loadUserGames(userId) {
       
       // Limpa o container de jogos
       userGames.innerHTML = '';
-      
-      // Adiciona cada jogo à lista
+        // Adiciona cada jogo à lista
       querySnapshot.forEach((doc) => {
         const jogo = doc.data();
         const jogoElement = document.createElement('div');
         jogoElement.className = 'game-card';
+        
+        // Verifica a URL da thumbnail para evitar problemas de CORS
+        let thumbnailUrl = jogo.thumbnailUrl || 'assets/placeholder.png';
+        
         jogoElement.innerHTML = `
-          <div class="game-thumbnail" style="--bg-image: url('${jogo.thumbnailUrl || 'assets/placeholder.png'}')"></div>
+          <div class="game-thumbnail" style="--bg-image: url('${thumbnailUrl}')" data-thumbnail-url="${thumbnailUrl}"></div>
           <div class="game-info">
             <h3>${jogo.titulo}</h3>
             <div class="rating">
