@@ -37,6 +37,16 @@ function criarMetadados(file) {
   };
 };
 
+// Configura o Storage para permitir CORS
+function configurarStoragePublico(storageRef) {
+  // Define metadados que permitem acesso público
+  const metadata = {
+    cacheControl: 'public,max-age=31536000',
+  };
+  
+  return metadata;
+}
+
 // Funções para manipulação de jogos no Firestore
 
 // Função para carregar todos os jogos
@@ -367,9 +377,7 @@ async function adicionarJogo(evento) {
 
     // Upload da thumbnail se fornecida
     let thumbnailUrl = 'assets/default-game.png';
-    const thumbnailInput = formulario.thumbnail;
-
-    if (thumbnailInput.files.length > 0) {
+    const thumbnailInput = formulario.thumbnail;    if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
       
       // Valida o arquivo de imagem
@@ -378,10 +386,26 @@ async function adicionarJogo(evento) {
       const filename = `${Date.now()}_${file.name}`;
       const storageRef = storage.ref(`thumbnails/${filename}`);
       
-      // Usa metadados específicos para o tipo de arquivo
-      const metadata = criarMetadados(file);
-      await storageRef.put(file, metadata);
-      thumbnailUrl = await storageRef.getDownloadURL();
+      try {
+        // Usa metadados específicos para o tipo de arquivo
+        const metadata = criarMetadados(file);
+        
+        // Configura o Storage para acesso público
+        const publicMetadata = configurarStoragePublico(storageRef);
+        
+        // Combina os metadados
+        const combinedMetadata = { ...metadata, ...publicMetadata };
+        
+        // Faz upload com os metadados combinados
+        await storageRef.put(file, combinedMetadata);
+        
+        // Obtém a URL com um token de download
+        thumbnailUrl = await storageRef.getDownloadURL();
+        console.log("Upload bem-sucedido, URL:", thumbnailUrl);
+      } catch (uploadError) {
+        console.error("Erro específico de upload:", uploadError);
+        throw new Error(`Erro ao fazer upload da imagem: ${uploadError.message}`);
+      }
     }    
     // Cria documento no Firestore com os dados do usuário
     await jogosCollection.add({
@@ -401,8 +425,7 @@ async function adicionarJogo(evento) {
     await carregarJogos();
     fecharModal();
 
-    alert('Jogo adicionado com sucesso!');
-  } catch (error) {
+    alert('Jogo adicionado com sucesso!');  } catch (error) {
     console.error("Erro ao adicionar jogo:", error);
     
     // Mensagem de erro mais detalhada com base no tipo de erro
@@ -410,6 +433,9 @@ async function adicionarJogo(evento) {
       alert("Erro: Você não tem permissão para fazer upload de arquivos.");
     } else if (error.code === 'storage/canceled') {
       alert("O upload foi cancelado.");
+    } else if (error.code === 'storage/cors-error' || error.message.includes('CORS')) {
+      alert("Erro de CORS: Verifique se o Firebase está configurado para permitir solicitações do seu domínio.");
+      console.error("Detalhes do erro CORS:", error);
     } else if (error.code === 'storage/unknown') {
       alert("Erro desconhecido no upload. Verifique o console para mais detalhes.");
     } else if (error.message && error.message.includes('arquivo')) {
@@ -515,8 +541,7 @@ async function atualizarJogo(evento, jogoId) {
     };
 
     // Upload da thumbnail se fornecida
-    const thumbnailInput = formulario.thumbnail;
-    if (thumbnailInput.files.length > 0) {
+    const thumbnailInput = formulario.thumbnail;    if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
       
       // Valida o arquivo de imagem
@@ -525,10 +550,26 @@ async function atualizarJogo(evento, jogoId) {
       const filename = `${Date.now()}_${file.name}`;
       const storageRef = storage.ref(`thumbnails/${filename}`);
       
-      // Usa metadados específicos para o tipo de arquivo
-      const metadata = criarMetadados(file);
-      await storageRef.put(file, metadata);
-      dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
+      try {
+        // Usa metadados específicos para o tipo de arquivo
+        const metadata = criarMetadados(file);
+        
+        // Configura o Storage para acesso público
+        const publicMetadata = configurarStoragePublico(storageRef);
+        
+        // Combina os metadados
+        const combinedMetadata = { ...metadata, ...publicMetadata };
+        
+        // Faz upload com os metadados combinados
+        await storageRef.put(file, combinedMetadata);
+        
+        // Obtém a URL com um token de download
+        dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
+        console.log("Upload bem-sucedido, URL:", dadosAtualizados.thumbnailUrl);
+      } catch (uploadError) {
+        console.error("Erro específico de upload:", uploadError);
+        throw new Error(`Erro ao fazer upload da imagem: ${uploadError.message}`);
+      }
     }
 
     // Atualiza documento no Firestore
@@ -538,8 +579,7 @@ async function atualizarJogo(evento, jogoId) {
     await carregarJogos();
     fecharModal();
 
-    alert('Jogo atualizado com sucesso!');
-  } catch (error) {
+    alert('Jogo atualizado com sucesso!');  } catch (error) {
     console.error("Erro ao atualizar jogo:", error);
     
     // Mensagem de erro mais detalhada com base no tipo de erro
@@ -547,6 +587,9 @@ async function atualizarJogo(evento, jogoId) {
       alert("Erro: Você não tem permissão para fazer upload de arquivos.");
     } else if (error.code === 'storage/canceled') {
       alert("O upload foi cancelado.");
+    } else if (error.code === 'storage/cors-error' || error.message.includes('CORS')) {
+      alert("Erro de CORS: Verifique se o Firebase está configurado para permitir solicitações do seu domínio.");
+      console.error("Detalhes do erro CORS:", error);
     } else if (error.code === 'storage/unknown') {
       alert("Erro desconhecido no upload. Verifique o console para mais detalhes.");
     } else if (error.message && error.message.includes('arquivo')) {

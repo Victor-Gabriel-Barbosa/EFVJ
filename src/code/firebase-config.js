@@ -16,6 +16,9 @@ firebase.initializeApp(firebaseConfig);
 const db = firebase.firestore();
 const storage = firebase.storage();
 
+// Configuração CORS para o Storage
+console.log("Domínio atual (para CORS):", window.location.origin);
+
 // Referências às coleções
 const jogosCollection = db.collection('jogos');
 const avaliacoesCollection = db.collection('avaliacoes');
