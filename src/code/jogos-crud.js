@@ -1,12 +1,43 @@
-// Funções para manipulação de jogos no Firestore
+// Constantes para upload de arquivos
+const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB em bytes
+const ACCEPTED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp', 'image/svg+xml'];
 
-// Configuração dos metadados para resolver problema de CORS
-const metadataStorage = {
-  contentType: 'image/jpeg',
-  customMetadata: {
-    'firebaseStorageDownloadTokens': Math.random().toString(36).substring(2)
+// Função para validar arquivo de imagem
+function validarArquivoImagem(file) {
+  // Verifica se é uma imagem
+  if (!ACCEPTED_IMAGE_TYPES.includes(file.type)) {
+    throw new Error(`Tipo de arquivo não suportado. Use apenas: JPG, PNG, GIF, WEBP ou SVG.`);
   }
+  
+  // Verifica o tamanho do arquivo
+  if (file.size > MAX_FILE_SIZE) {
+    throw new Error(`O arquivo é muito grande. O tamanho máximo permitido é ${MAX_FILE_SIZE/1024/1024}MB.`);
+  }
+  
+  return true;
+}
+
+// Função auxiliar para gerar metadados do Storage com tipo de conteúdo adequado
+function criarMetadados(file) {
+  // Detecta o tipo de conteúdo com base na extensão do arquivo
+  let contentType = 'image/jpeg'; // padrão
+  const fileName = file.name.toLowerCase();
+  
+  if (fileName.endsWith('.png')) contentType = 'image/png';
+  else if (fileName.endsWith('.gif')) contentType = 'image/gif';
+  else if (fileName.endsWith('.webp')) contentType = 'image/webp';
+  else if (fileName.endsWith('.svg')) contentType = 'image/svg+xml';
+  
+  // Gera um token único para cada upload
+  return {
+    contentType: contentType,
+    customMetadata: {
+      'firebaseStorageDownloadTokens': Math.random().toString(36).substring(2) + Date.now().toString(36)
+    }
+  };
 };
+
+// Funções para manipulação de jogos no Firestore
 
 // Função para carregar todos os jogos
 async function carregarJogos() {
@@ -202,8 +233,14 @@ function ajustarTextoContadorResponsivo() {
   const counterText = document.querySelector('.counter-text');
   if (!counterText) return;
   
-  const filteredCount = document.querySelector('.filtered-count').textContent;
-  const totalCount = document.querySelector('.total-count').textContent;
+  const filteredElem = document.querySelector('.filtered-count');
+  const totalElem = document.querySelector('.total-count');
+  
+  // Verifica se os elementos existem antes de continuar
+  if (!filteredElem || !totalElem) return;
+  
+  const filteredCount = filteredElem.textContent;
+  const totalCount = totalElem.textContent;
   
   // Verifica o tamanho da tela e ajusta o texto conforme necessário
   if (window.innerWidth <= 320) {
@@ -245,8 +282,12 @@ function atualizarContadores() {
   const totalJogos = document.querySelectorAll('.game-card').length;
   const jogosFiltrados = document.querySelectorAll('.game-card[style="display: block;"], .game-card:not([style*="display"])').length;
   
-  document.querySelector('.total-count').textContent = totalJogos;
-  document.querySelector('.filtered-count').textContent = jogosFiltrados;
+  // Verifica se os elementos existem antes de atualizá-los
+  const totalCountElem = document.querySelector('.total-count');
+  const filteredCountElem = document.querySelector('.filtered-count');
+  
+  if (totalCountElem) totalCountElem.textContent = totalJogos;
+  if (filteredCountElem) filteredCountElem.textContent = jogosFiltrados;
   
   // Aplica responsividade ao texto do contador
   ajustarTextoContadorResponsivo();
@@ -330,11 +371,16 @@ async function adicionarJogo(evento) {
 
     if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
+      
+      // Valida o arquivo de imagem
+      validarArquivoImagem(file);
+      
       const filename = `${Date.now()}_${file.name}`;
       const storageRef = storage.ref(`thumbnails/${filename}`);
       
-      // Usa os metadados customizados para resolver problema de CORS
-      await storageRef.put(file, metadataStorage);
+      // Usa metadados específicos para o tipo de arquivo
+      const metadata = criarMetadados(file);
+      await storageRef.put(file, metadata);
       thumbnailUrl = await storageRef.getDownloadURL();
     }    
     // Cria documento no Firestore com os dados do usuário
@@ -358,7 +404,19 @@ async function adicionarJogo(evento) {
     alert('Jogo adicionado com sucesso!');
   } catch (error) {
     console.error("Erro ao adicionar jogo:", error);
-    alert("Erro ao adicionar jogo. Por favor, tente novamente.");
+    
+    // Mensagem de erro mais detalhada com base no tipo de erro
+    if (error.code === 'storage/unauthorized') {
+      alert("Erro: Você não tem permissão para fazer upload de arquivos.");
+    } else if (error.code === 'storage/canceled') {
+      alert("O upload foi cancelado.");
+    } else if (error.code === 'storage/unknown') {
+      alert("Erro desconhecido no upload. Verifique o console para mais detalhes.");
+    } else if (error.message && error.message.includes('arquivo')) {
+      alert(error.message);
+    } else {
+      alert("Erro ao adicionar jogo. Por favor, tente novamente.");
+    }
   } finally {
     btnSubmit.disabled = false;
     btnSubmit.textContent = 'Salvar Jogo';
@@ -386,7 +444,8 @@ async function abrirFormularioEdicao(jogoId) {
 
     // Preenche o formulário com os dados atuais
     const formulario = document.getElementById('form-jogo');
-    formulario.reset();    formulario.titulo.value = jogo.titulo;
+    formulario.reset();    
+    formulario.titulo.value = jogo.titulo;
     formulario.autor.value = jogo.autor;
     formulario.categoria.value = jogo.categoria;
     formulario.linkJogo.value = jogo.linkJogo;
@@ -459,11 +518,16 @@ async function atualizarJogo(evento, jogoId) {
     const thumbnailInput = formulario.thumbnail;
     if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
+      
+      // Valida o arquivo de imagem
+      validarArquivoImagem(file);
+      
       const filename = `${Date.now()}_${file.name}`;
       const storageRef = storage.ref(`thumbnails/${filename}`);
       
-      // Usa os metadados customizados para resolver problema de CORS
-      await storageRef.put(file, metadataStorage);
+      // Usa metadados específicos para o tipo de arquivo
+      const metadata = criarMetadados(file);
+      await storageRef.put(file, metadata);
       dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
     }
 
@@ -477,7 +541,19 @@ async function atualizarJogo(evento, jogoId) {
     alert('Jogo atualizado com sucesso!');
   } catch (error) {
     console.error("Erro ao atualizar jogo:", error);
-    alert("Erro ao atualizar jogo. Por favor, tente novamente.");
+    
+    // Mensagem de erro mais detalhada com base no tipo de erro
+    if (error.code === 'storage/unauthorized') {
+      alert("Erro: Você não tem permissão para fazer upload de arquivos.");
+    } else if (error.code === 'storage/canceled') {
+      alert("O upload foi cancelado.");
+    } else if (error.code === 'storage/unknown') {
+      alert("Erro desconhecido no upload. Verifique o console para mais detalhes.");
+    } else if (error.message && error.message.includes('arquivo')) {
+      alert(error.message);
+    } else {
+      alert("Erro ao atualizar jogo. Por favor, tente novamente.");
+    }
   } finally {
     btnSubmit.disabled = false;
     btnSubmit.textContent = 'Atualizar Jogo';
