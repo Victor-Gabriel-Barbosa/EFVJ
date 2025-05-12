@@ -67,7 +67,7 @@ function criarElementoJogo(jogo, jogoId) {
   divJogo.dataset.category = jogo.categoria;
   divJogo.dataset.id = jogoId;
 
-  const thumbnailUrl = jogo.thumbnailUrl || 'assets/default-game.png';
+  const thumbnailUrl = jogo.thumbnailUrl || 'images/default-game.png';
 
   // Verifica se o usuário atual é o criador do jogo
   const currentUser = window.userAuth?.currentUser();
@@ -335,7 +335,7 @@ async function adicionarJogo(evento) {
     const autor = formulario.autor.value || currentUser.displayName;
     const categoria = formulario.categoria.value;
     const linkJogo = formulario.linkJogo.value;    // Upload da thumbnail se fornecida
-    let thumbnailUrl = 'assets/default-game.png';
+    let thumbnailUrl = 'images/default-game.png';
     const thumbnailInput = formulario.thumbnail;
 
     if (thumbnailInput.files.length > 0) {
