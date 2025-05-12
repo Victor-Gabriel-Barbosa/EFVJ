@@ -1,0 +1,134 @@
+/* Arquivo de estilos responsivos para a navbar */
+
+
+/* Media Queries para Responsividade da Navbar */
+@media (max-width: 968px) {
+  .nav-menu {
+    position: relative;
+    left: 0;
+    transform: none;
+    margin: 0 auto;
+  }
+  
+  .user-area {
+    margin-left: 15px;
+  }
+}
+
+@media (max-width: 768px) {
+  .mobile-menu-toggle {
+    display: block;
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  
+  .nav-container {
+    justify-content: flex-end;
+  }
+  
+  .nav-menu {
+    position: fixed;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100vh;
+    background-color: var(--dark);
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    transition: all 0.5s ease;
+    z-index: 99;
+    padding-top: 60px;
+    padding-bottom: 60px;
+    gap: 30px;
+    overflow-y: auto; /* Para telas muito pequenas com scroll */
+  }
+  
+  .nav-menu.active {
+    left: 0;
+  }
+  
+  .nav-menu li {
+    margin: 10px 0;
+    width: 80%;
+    text-align: center;
+  }
+  
+  .nav-menu li a {
+    font-size: 1.2rem;
+    width: 100%;
+    display: block;
+    padding: 12px;
+  }
+  
+  .game-nav {
+    padding: 10px 15px;
+  }
+  
+  .user-area {
+    margin-right: 20px;
+  }
+  
+  /* Melhoria para evitar scroll horizontal em dispositivos móveis */
+  body.menu-open {
+    overflow: hidden;
+  }
+}
+
+@media (max-width: 480px) {
+  .user-area {
+    margin-right: 10px;
+    margin-left: 5px;
+  }
+  
+  .auth-buttons {
+    margin-left: 5px;
+  }
+  
+  .user-nav-info {
+    padding: 4px 8px;
+  }
+  
+  .nav-avatar {
+    width: 28px;
+    height: 28px;
+  }
+  
+  .pixel-button {
+    padding: 6px 12px;
+    font-size: 0.7rem;
+  }
+  
+  .nav-brand {
+    font-size: 1rem;
+    margin-right: 10px;
+  }
+  
+  /* Ajustes extras para telas muito pequenas */
+  .nav-menu li a {
+    font-size: 1rem;
+    padding: 10px;
+  }
+}
+
+/* Pequenos ajustes para telas muito pequenas */
+@media (max-width: 360px) {
+  .nav-brand {
+    font-size: 0.9rem;
+    margin-right: 5px;
+  }
+  
+  .auth-buttons a {
+    padding: 5px 10px;
+    font-size: 0.65rem;
+  }
+  
+  .mobile-menu-toggle {
+    padding: 8px;
+  }
+  
+  .hamburger-icon {
+    width: 25px;
+    height: 18px;
+  }
+}

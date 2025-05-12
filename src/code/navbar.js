@@ -176,11 +176,20 @@ function configurarBotoesAutenticacao() {
 function configurarMenuMobile() {
   const menuToggle = document.querySelector('.mobile-menu-toggle');
   const navMenu = document.querySelector('.nav-menu');
+  const navContainer = document.querySelector('.nav-container');
 
   if (menuToggle && navMenu) {
-    menuToggle.addEventListener('click', function () {
+    menuToggle.addEventListener('click', function (e) {
+      e.stopPropagation(); // Evita propagação do evento
       navMenu.classList.toggle('active');
       menuToggle.classList.toggle('active'); // Adiciona/remove classe active no botão para animar o ícone
+      
+      // Adiciona classe ao body para evitar scroll quando o menu estiver aberto
+      if (navMenu.classList.contains('active')) {
+        document.body.classList.add('menu-open');
+      } else {
+        document.body.classList.remove('menu-open');
+      }
     });
     
     // Fecha o menu quando um item é clicado
@@ -189,16 +198,34 @@ function configurarMenuMobile() {
       item.addEventListener('click', function() {
         navMenu.classList.remove('active');
         menuToggle.classList.remove('active');
+        document.body.classList.remove('menu-open');
       });
     });
     
     // Fecha o menu quando clica fora dele
     document.addEventListener('click', function(event) {
-      const isClickInside = navMenu.contains(event.target) || menuToggle.contains(event.target);
+      const isClickInside = navMenu.contains(event.target) || 
+                            menuToggle.contains(event.target);
+      
       if (!isClickInside && navMenu.classList.contains('active')) {
         navMenu.classList.remove('active');
         menuToggle.classList.remove('active');
+        document.body.classList.remove('menu-open');
       }
+    });
+    
+    // Adiciona evento para redimensionamento da janela
+    window.addEventListener('resize', function() {
+      if (window.innerWidth > 768 && navMenu.classList.contains('active')) {
+        navMenu.classList.remove('active');
+        menuToggle.classList.remove('active');
+        document.body.classList.remove('menu-open');
+      }
+    });
+    
+    // Previne o fechamento do menu ao clicar dentro dele
+    navMenu.addEventListener('click', function(event) {
+      event.stopPropagation();
     });
   }
 }
