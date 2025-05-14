@@ -49,11 +49,20 @@ async function carregarJogos() {
       return;
     }
 
-    jogosGrid.innerHTML = '';
-
-    snapshot.forEach(doc => {
+    jogosGrid.innerHTML = '';    snapshot.forEach(doc => {
       const jogo = doc.data();
       const jogoId = doc.id;
+
+      // Validação dos dados mínimos necessários
+      if (!jogo) {
+        console.warn(`Documento ${jogoId} não possui dados válidos. Pulando.`);
+        return;
+      }
+
+      // Inicializa campos importantes se necessário
+      if (jogo.avaliacao === undefined || jogo.avaliacao === null) {
+        jogo.avaliacao = 0;
+      }
 
       const jogoElement = criarElementoJogo(jogo, jogoId);
       jogosGrid.appendChild(jogoElement);
@@ -71,9 +80,10 @@ async function carregarJogos() {
 }
 
 // Função para criar elemento de jogo na interface
-function criarElementoJogo(jogo, jogoId) {  const divJogo = document.createElement('div');
+function criarElementoJogo(jogo, jogoId) {  
+  const divJogo = document.createElement('div');
   divJogo.className = 'game-card';
-  divJogo.dataset.category = jogo.categoria;
+  divJogo.dataset.category = jogo.categoria || 'outros';
   divJogo.dataset.id = jogoId;
 
   // Determina a URL da thumbnail
@@ -100,42 +110,39 @@ function criarElementoJogo(jogo, jogoId) {  const divJogo = document.createEleme
       <button class="pixel-button delete-btn" onclick="confirmarExclusao('${jogoId}')"><i class="fas fa-trash-alt"></i> Excluir</button>
     </div>
   ` : '';
-
   // Exibe avaliações por categoria se disponíveis
   let avaliacoesCategorias = '';
   if (jogo.avaliacoesPorCategoria) {
     avaliacoesCategorias = `
       <div class="category-ratings">
-        ${jogo.avaliacoesPorCategoria.gameplay ?
-          `<div class="category-score">Gameplay<span>${jogo.avaliacoesPorCategoria.gameplay.toFixed(1)}</span></div>` : ''}
-        ${jogo.avaliacoesPorCategoria.visual ?
-          `<div class="category-score">Visual<span>${jogo.avaliacoesPorCategoria.visual.toFixed(1)}</span></div>` : ''}
-        ${jogo.avaliacoesPorCategoria.som ?
-          `<div class="category-score">Som<span>${jogo.avaliacoesPorCategoria.som.toFixed(1)}</span></div>` : ''}
-        ${jogo.avaliacoesPorCategoria.originalidade ?
-          `<div class="category-score">Original<span>${jogo.avaliacoesPorCategoria.originalidade.toFixed(1)}</span></div>` : ''}
+        ${jogo.avaliacoesPorCategoria.gameplay !== undefined ?
+          `<div class="category-score">Gameplay<span>${Number(jogo.avaliacoesPorCategoria.gameplay).toFixed(1)}</span></div>` : ''}
+        ${jogo.avaliacoesPorCategoria.visual !== undefined ?
+          `<div class="category-score">Visual<span>${Number(jogo.avaliacoesPorCategoria.visual).toFixed(1)}</span></div>` : ''}
+        ${jogo.avaliacoesPorCategoria.som !== undefined ?
+          `<div class="category-score">Som<span>${Number(jogo.avaliacoesPorCategoria.som).toFixed(1)}</span></div>` : ''}
+        ${jogo.avaliacoesPorCategoria.originalidade !== undefined ?
+          `<div class="category-score">Original<span>${Number(jogo.avaliacoesPorCategoria.originalidade).toFixed(1)}</span></div>` : ''}
       </div>
     `;
-  }
-  // Adiciona badge da categoria
-  const categoriaNome = jogo.categoria.charAt(0).toUpperCase() + jogo.categoria.slice(1);
-  const badgeCategoria = `<div class="category-badge ${jogo.categoria}">${categoriaNome}</div>`;
-
+  }  // Adiciona badge da categoria
+  const categoria = jogo.categoria || 'outros';
+  const categoriaNome = categoria.charAt(0).toUpperCase() + categoria.slice(1);
+  const badgeCategoria = `<div class="category-badge ${categoria}">${categoriaNome}</div>`;
   divJogo.innerHTML = `
     ${badgeCategoria}
-    <a href="${jogo.linkJogo}" target="_blank" class="thumbnail-link">
+    <a href="${jogo.linkJogo || '#'}" target="_blank" class="thumbnail-link">
       <div class="game-thumbnail" style="--bg-image: url('${thumbnailUrl}')"></div>
     </a>
     <div class="game-info">
-      <h3>${jogo.titulo}</h3>
-      <p><i class="fas fa-user"></i> Por: ${jogo.autor}</p>
+      <h3>${jogo.titulo || 'Sem título'}</h3>
+      <p><i class="fas fa-user"></i> Por: ${jogo.autor || 'Anônimo'}</p>
       <div class="rating">
-        <div class="rating-stars">${gerarEstrelas(jogo.avaliacao)}</div>
-        <span class="rating-text">${jogo.avaliacao.toFixed(1)}</span>
-      </div>
+        <div class="rating-stars">${gerarEstrelas(jogo.avaliacao || 0)}</div>
+        <span class="rating-text">${(jogo.avaliacao !== undefined && jogo.avaliacao !== null) ? jogo.avaliacao.toFixed(1) : '0.0'}</span>      </div>
       ${avaliacoesCategorias}
       <div class="game-buttons">
-        <a href="${jogo.linkJogo}" class="pixel-button play-btn" target="_blank"><i class="fas fa-gamepad"></i> Jogar</a>
+        <a href="${jogo.linkJogo || '#'}" class="pixel-button play-btn" target="_blank"><i class="fas fa-gamepad"></i> Jogar</a>
         <a href="avaliacao.html?jogo=${jogoId}" class="pixel-button rate-btn"><i class="fas fa-star"></i> Avaliar</a>
       </div>
       ${acoesBtns}
@@ -150,11 +157,13 @@ function gerarEstrelas(avaliacao) {
   let estrelas = '';
   const totalEstrelas = 5;
   
+  // Garantir que avaliacao seja um número
+  const avaliacaoNum = Number(avaliacao) || 0;
+  
   for (let i = 1; i <= totalEstrelas; i++) {
-    if (i <= Math.floor(avaliacao)) {
+    if (i <= Math.floor(avaliacaoNum)) {
       // Estrela completa
-      estrelas += `<span class="pixel-star filled" title="${i} de 5"></span>`;
-    } else if (i - 0.5 <= avaliacao) {
+      estrelas += `<span class="pixel-star filled" title="${i} de 5"></span>`;    } else if (i - 0.5 <= avaliacaoNum) {
       // Meia estrela (para avaliações como 3.5, 4.5)
       estrelas += `<span class="pixel-star half-filled" title="${i-0.5} de 5"></span>`;
     } else {
@@ -294,26 +303,30 @@ function ordenarJogos(criterio) {
   
   // Ordena os jogos com base no critério selecionado
   jogos.sort((a, b) => {
-    switch(criterio) {
-      case 'recentes':
+    switch(criterio) {      case 'recentes':
         // Ordena pela data de criação, assumindo que o ID tenha timestamp ou ordem de criação
-        return b.dataset.id.localeCompare(a.dataset.id);
+        const idA = a.dataset.id || '';
+        const idB = b.dataset.id || '';
+        return idB.localeCompare(idA);
       
       case 'populares':
         // Para uma ordenação real baseada em popularidade, você precisaria 
         // adicionar um atributo de contagem de visualizações ao carregar os jogos
         // Aqui simulamos um contador básico baseado no ID como exemplo
-        return parseInt(b.dataset.id.slice(-5), 16) - parseInt(a.dataset.id.slice(-5), 16);
-      
-      case 'avaliacao':
+        const idPopA = a.dataset.id ? a.dataset.id.slice(-5) : '0';
+        const idPopB = b.dataset.id ? b.dataset.id.slice(-5) : '0';
+        return parseInt(idPopB, 16) - parseInt(idPopA, 16);
+        case 'avaliacao':
         // Ordena pela avaliação (nota)
-        const avaliacaoA = parseFloat(a.querySelector('.rating-text').textContent);
-        const avaliacaoB = parseFloat(b.querySelector('.rating-text').textContent);
+        const avaliacaoA = parseFloat(a.querySelector('.rating-text')?.textContent || '0');
+        const avaliacaoB = parseFloat(b.querySelector('.rating-text')?.textContent || '0');
         return avaliacaoB - avaliacaoA;
       
       case 'titulo':
         // Ordena pelo título alfabeticamente
-        return a.querySelector('h3').textContent.localeCompare(b.querySelector('h3').textContent);
+        const tituloA = a.querySelector('h3')?.textContent || '';
+        const tituloB = b.querySelector('h3')?.textContent || '';
+        return tituloA.localeCompare(tituloB);
       
       default:
         return 0;
@@ -635,9 +648,65 @@ function salvarJogo(evento) {
   (jogoId) ? atualizarJogo(evento, jogoId) : adicionarJogo(evento);
 }
 
+// Função para migrar dados de thumbnailUrl para o novo formato thumbnail
+async function migrarThumbnailsAntigos() {
+  try {
+    console.log('Verificando jogos com formato antigo de thumbnail...');
+    
+    // Busca jogos que ainda usam o formato antigo (thumbnailUrl em vez de thumbnail)
+    const snapshot = await jogosCollection.where('thumbnailUrl', '!=', null).get();
+    
+    if (snapshot.empty) {
+      console.log('Nenhum jogo com formato antigo encontrado.');
+      return;
+    }
+    
+    console.log(`Encontrados ${snapshot.size} jogos com formato antigo. Iniciando migração...`);
+    
+    let jogosAtualizados = 0;
+    
+    // Para cada jogo com formato antigo
+    for (const doc of snapshot.docs) {
+      const jogo = doc.data();
+      
+      // Pula se já tiver o novo formato
+      if (jogo.thumbnail && jogo.thumbnail.url) {
+        continue;
+      }
+      
+      // Cria o novo formato a partir da URL antiga
+      const thumbnailData = {
+        url: jogo.thumbnailUrl || 'src/images/default-game.png',
+        isBase64: false,
+        contentType: jogo.thumbnailUrl && jogo.thumbnailUrl.includes('.png') ? 'image/png' : 'image/jpeg',
+        fileName: 'migrated-image',
+        dateMigrated: new Date().toISOString()
+      };
+      
+      // Atualiza o documento com o novo formato
+      await jogosCollection.doc(doc.id).update({
+        thumbnail: thumbnailData
+      });
+      
+      jogosAtualizados++;
+      
+      if (jogosAtualizados % 10 === 0) {
+        console.log(`Migrados ${jogosAtualizados} jogos...`);
+      }
+    }
+    
+    console.log(`Migração concluída: ${jogosAtualizados} jogos atualizados para o novo formato.`);
+  } catch (error) {
+    console.error('Erro ao migrar thumbnails antigos:', error);
+  }
+}
+
 // Inicialização
 document.addEventListener('DOMContentLoaded', () => {  // Verifica se está na página de jogos antes de inicializar funcionalidades específicas
   const isJogosPage = window.location.pathname.includes('jogos.html');
+  
+  // Executa a migração de imagens independente da página
+  migrarThumbnailsAntigos();
   
   // Carrega jogos apenas se estiver na página de jogos
   if (isJogosPage) {
