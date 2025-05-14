@@ -1,23 +1,33 @@
 // Funções para manipulação de jogos no Firestore
 
-// Função auxiliar para gerar metadados do Storage com tipo de conteúdo adequado
-function criarMetadados(file) {
-  // Detecta o tipo de conteúdo com base na extensão do arquivo
-  let contentType = 'image/jpeg'; // padrão
-  const fileName = file.name.toLowerCase();
-  
-  if (fileName.endsWith('.png')) contentType = 'image/png';
-  else if (fileName.endsWith('.gif')) contentType = 'image/gif';
-  else if (fileName.endsWith('.webp')) contentType = 'image/webp';
-  else if (fileName.endsWith('.svg')) contentType = 'image/svg+xml';
-  
-  // Gera um token único para cada upload
-  return {
-    contentType: contentType,
-    customMetadata: {
-      'firebaseStorageDownloadTokens': Math.random().toString(36).substring(2) + Date.now().toString(36)
+// Função para converter imagem em base64
+async function converterImagemParaBase64(file) {
+  return new Promise((resolve, reject) => {
+    // Verifica se o arquivo é uma imagem
+    if (!file.type.startsWith('image/')) {
+      reject(new Error('O arquivo enviado não é uma imagem válida.'));
+      return;
     }
-  };
+    
+    // Detecta o tipo de conteúdo com base na extensão do arquivo
+    let contentType = file.type;
+    
+    // Cria um FileReader para ler o arquivo como DataURL (base64)
+    const reader = new FileReader();
+    reader.onload = (e) => {
+      // e.target.result contém a string base64 completa com prefixo como 'data:image/jpeg;base64,'
+      resolve({
+        dataUrl: e.target.result,
+        contentType: contentType
+      });
+    };
+    reader.onerror = (e) => {
+      reject(new Error('Erro ao ler o arquivo: ' + e.target.error));
+    };
+    
+    // Inicia a leitura do arquivo como DataURL
+    reader.readAsDataURL(file);
+  });
 };
 
 // Função para carregar todos os jogos
@@ -61,13 +71,23 @@ async function carregarJogos() {
 }
 
 // Função para criar elemento de jogo na interface
-function criarElementoJogo(jogo, jogoId) {
-  const divJogo = document.createElement('div');
+function criarElementoJogo(jogo, jogoId) {  const divJogo = document.createElement('div');
   divJogo.className = 'game-card';
   divJogo.dataset.category = jogo.categoria;
   divJogo.dataset.id = jogoId;
 
-  const thumbnailUrl = jogo.thumbnailUrl || 'src/images/default-game.png';
+  // Determina a URL da thumbnail
+  let thumbnailUrl;
+  if (jogo.thumbnail) {
+    // Novo formato (objeto com url)
+    thumbnailUrl = jogo.thumbnail.isBase64 ? jogo.thumbnail.url : jogo.thumbnail.url || 'src/images/default-game.png';
+  } else if (jogo.thumbnailUrl) {
+    // Formato antigo (apenas URL)
+    thumbnailUrl = jogo.thumbnailUrl;
+  } else {
+    // Fallback para imagem padrão
+    thumbnailUrl = 'src/images/default-game.png';
+  }
 
   // Verifica se o usuário atual é o criador do jogo
   const currentUser = window.userAuth?.currentUser();
@@ -328,33 +348,41 @@ async function adicionarJogo(evento) {
 
   try {
     btnSubmit.disabled = true;
-    btnSubmit.textContent = 'Salvando...'; 
-
-    // Obtém valores do formulário
+    btnSubmit.textContent = 'Salvando...';     // Obtém valores do formulário
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value || currentUser.displayName;
     const categoria = formulario.categoria.value;
-    const linkJogo = formulario.linkJogo.value;    // Upload da thumbnail se fornecida
-    let thumbnailUrl = 'src/images/default-game.png';
+    const linkJogo = formulario.linkJogo.value;
+    
+    // Define URL padrão para thumbnail
+    let thumbnailData = {
+      url: 'src/images/default-game.png',
+      isBase64: false
+    };
+    
     const thumbnailInput = formulario.thumbnail;
 
     if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
       
-      // Verifica se o arquivo é uma imagem
-      if (!file.type.startsWith('image/')) {
-        throw new Error('O arquivo enviado não é uma imagem válida.');
+      // Verifica tamanho do arquivo (limitado a 1MB para não sobrecarregar o Firestore)
+      if (file.size > 1024 * 1024) {
+        throw new Error('A imagem deve ter no máximo 1MB. Por favor, comprima a imagem antes de fazer upload.');
       }
       
-      const filename = `${Date.now()}_${file.name}`;
-      const storageRef = storage.ref(`thumbnails/${filename}`);
+      // Converte a imagem para base64
+      const imageData = await converterImagemParaBase64(file);
       
-      // Usa metadados específicos para o tipo de arquivo
-      const metadata = criarMetadados(file);
-      await storageRef.put(file, metadata);
-      thumbnailUrl = await storageRef.getDownloadURL();
-    }
-    // Cria documento no Firestore com os dados do usuário
+      // Armazena os dados no objeto thumbnailData
+      thumbnailData = {
+        url: imageData.dataUrl,
+        contentType: imageData.contentType,
+        fileName: file.name,
+        size: file.size,
+        isBase64: true,
+        dateAdded: new Date().toISOString()
+      };
+    }    // Cria documento no Firestore com os dados do usuário
     await jogosCollection.add({
       titulo,
       autor,
@@ -362,7 +390,7 @@ async function adicionarJogo(evento) {
       avaliacao: 0, // Valor inicial de avaliação (sem avaliações)
       numeroAvaliacoes: 0, // Contador de avaliações
       linkJogo,
-      thumbnailUrl,
+      thumbnail: thumbnailData, // Objeto contendo URL (padrão ou base64) e metadados
       autorId: currentUser.uid,
       autorEmail: currentUser.email,
       dataCriacao: firebase.firestore.FieldValue.serverTimestamp()
@@ -370,24 +398,19 @@ async function adicionarJogo(evento) {
 
     // Recarrega jogos e fecha modal
     await carregarJogos();
-    fecharModal();
-
-    alert('Jogo adicionado com sucesso!');  } catch (error) {
+    fecharModal();    alert('Jogo adicionado com sucesso!');
+  } catch (error) {
     console.error("Erro ao adicionar jogo:", error);
     
     // Mensagem de erro mais detalhada com base no tipo de erro
-    if (error.code === 'storage/unauthorized') {
-      alert("Erro: Você não tem permissão para fazer upload de arquivos.");
-    } else if (error.code === 'storage/canceled') {
-      alert("O upload foi cancelado.");
-    } else if (error.code === 'storage/unknown') {
-      alert("Erro desconhecido no upload. Verifique o console para mais detalhes.");
-    } else if (error.message.includes('não é uma imagem')) {
+    if (error.message.includes('não é uma imagem')) {
+      alert(error.message);
+    } else if (error.message.includes('máximo 1MB')) {
       alert(error.message);
     } else {
       alert("Erro ao adicionar jogo. Por favor, tente novamente.");
     }
-  } finally {
+  }finally {
     btnSubmit.disabled = false;
     btnSubmit.textContent = 'Salvar Jogo';
   }
@@ -472,32 +495,37 @@ async function atualizarJogo(evento, jogoId) {
     const titulo = formulario.titulo.value;
     const autor = formulario.autor.value;
     const categoria = formulario.categoria.value;
-    const linkJogo = formulario.linkJogo.value;
-
-    // Dados a atualizar
+    const linkJogo = formulario.linkJogo.value;    // Dados a atualizar
     const dadosAtualizados = {
       titulo,
       autor,
       categoria,
       linkJogo,
       dataAtualizacao: firebase.firestore.FieldValue.serverTimestamp()
-    };    // Upload da thumbnail se fornecida
+    };
+    
+    // Upload da thumbnail se fornecida
     const thumbnailInput = formulario.thumbnail;
     if (thumbnailInput.files.length > 0) {
       const file = thumbnailInput.files[0];
       
-      // Verifica se o arquivo é uma imagem
-      if (!file.type.startsWith('image/')) {
-        throw new Error('O arquivo enviado não é uma imagem válida.');
+      // Verifica tamanho do arquivo (limitado a 1MB para não sobrecarregar o Firestore)
+      if (file.size > 1024 * 1024) {
+        throw new Error('A imagem deve ter no máximo 1MB. Por favor, comprima a imagem antes de fazer upload.');
       }
       
-      const filename = `${Date.now()}_${file.name}`;
-      const storageRef = storage.ref(`thumbnails/${filename}`);
+      // Converte a imagem para base64
+      const imageData = await converterImagemParaBase64(file);
       
-      // Usa metadados específicos para o tipo de arquivo
-      const metadata = criarMetadados(file);
-      await storageRef.put(file, metadata);
-      dadosAtualizados.thumbnailUrl = await storageRef.getDownloadURL();
+      // Armazena os dados no objeto thumbnail
+      dadosAtualizados.thumbnail = {
+        url: imageData.dataUrl,
+        contentType: imageData.contentType,
+        fileName: file.name,
+        size: file.size,
+        isBase64: true,
+        dateUpdated: new Date().toISOString()
+      };
     }
 
     // Atualiza documento no Firestore
@@ -541,26 +569,13 @@ async function confirmarExclusao(jogoId) {
 // Função para excluir jogo
 async function excluirJogo(jogoId) {
   try {
-    // Obtém a referência do jogo para pegar a URL da thumbnail
-    const doc = await jogosCollection.doc(jogoId).get();
+    // Exclui o documento do Firestore
+    await jogosCollection.doc(jogoId).delete();
 
-    if (doc.exists) {
-      const jogo = doc.data();
+    // Recarrega os jogos
+    await carregarJogos();
 
-      // Exclui a thumbnail do Storage se não for a imagem padrão
-      if (jogo.thumbnailUrl && !jogo.thumbnailUrl.includes('default-game.png')) {
-        const thumbRef = storage.refFromURL(jogo.thumbnailUrl);
-        await thumbRef.delete();
-      }
-
-      // Exclui o documento do Firestore
-      await jogosCollection.doc(jogoId).delete();
-
-      // Recarrega os jogos
-      await carregarJogos();
-
-      alert('Jogo excluído com sucesso!');
-    }
+    alert('Jogo excluído com sucesso!');
   } catch (error) {
     console.error("Erro ao excluir jogo:", error);
     alert("Erro ao excluir jogo. Por favor, tente novamente.");
